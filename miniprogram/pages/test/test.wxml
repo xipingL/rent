@@ -1,0 +1,2 @@
+<!--pages/test/test.wxml-->
+<van-button type="primary" size="normal" open-type="liveActivity">普通按钮</van-button>

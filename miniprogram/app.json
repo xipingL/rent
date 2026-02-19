@@ -1,0 +1,40 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/garage/garage",
+    "pages/notice/notice",
+    "pages/user/user",
+    "pages/home/home",
+    "pages/lease-end/lease-end",
+    "pages/car-add/car-add",
+    "pages/lease-extend/lease-extend",
+    "pages/lease-new/lease-new",
+    "pages/car-edit/car-edit"
+  ],
+  "tabBar": {
+    "custom": true,
+    "color": "#000000",
+    "selectedColor": "#000000",
+    "backgroundColor": "#000000",
+    "list": [
+      {
+        "pagePath": "pages/index/index"
+      },
+      {
+        "pagePath": "pages/notice/notice"
+      },
+      {
+        "pagePath": "pages/user/user"
+      }
+    ]
+  },
+  "window": {
+    "backgroundColor": "#F6F6F6",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#F6F6F6",
+    "navigationBarTitleText": "Crent",
+    "navigationBarTextStyle": "black"
+  },
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

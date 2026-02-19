@@ -1,0 +1,137 @@
+/* pages/lease-end/lease-end.wxss */
+
+.section {
+  margin-bottom: 32rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.section-title {
+  padding: 32rpx 32rpx 16rpx 32rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #323233;
+  border-bottom: 1rpx solid #ebedf0;
+  margin-bottom: 16rpx;
+}
+
+/* Vehicle Section */
+.vehicle-section {
+  margin-top: 16rpx;
+}
+
+/* Rental Records Section */
+.rental-records-section {
+  /* Default section styles apply */
+}
+
+/* Settlement Section */
+.settlement-section {
+  margin-bottom: 120rpx; /* Extra space for bottom button */
+}
+
+.form-item {
+  padding: 24rpx 32rpx;
+  border-bottom: 1rpx solid #ebedf0;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.form-label {
+  font-size: 28rpx;
+  color: #646566;
+  margin-bottom: 16rpx;
+}
+
+.settlement-button {
+  margin-top: 16rpx;
+  width: 100%;
+}
+
+.upload-tip {
+  font-size: 24rpx;
+  color: #ff976a;
+  margin-top: 8rpx;
+  text-align: center;
+}
+
+.notes-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+}
+
+.char-count {
+  color: #969799;
+}
+
+.char-count.warning {
+  color: #ff976a;
+}
+
+.char-warning {
+  color: #ff976a;
+  font-size: 22rpx;
+}
+
+/* Responsive design for mobile */
+@media screen and (max-width: 750rpx) {
+  .section {
+    margin: 0 16rpx 24rpx 16rpx;
+    border-radius: 12rpx;
+  }
+  
+  .section-title {
+    padding: 24rpx 24rpx 12rpx 24rpx;
+    font-size: 30rpx;
+  }
+  
+  .form-item {
+    padding: 20rpx 24rpx;
+  }
+}
+
+/* Loading overlay */
+.loading-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+.van-loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+}
+
+/* Dialog Content Styles */
+.dialog-content {
+  padding: 16rpx 0;
+}
+
+.dialog-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12rpx 0;
+  font-size: 28rpx;
+}
+
+.dialog-label {
+  color: #646566;
+  font-weight: 500;
+}
+
+.dialog-value {
+  color: #323233;
+  font-weight: 600;
+}

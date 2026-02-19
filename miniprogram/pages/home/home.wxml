@@ -1,0 +1,6 @@
+<!--pages/home/home.wxml-->
+<van-button type="default" bind:click='showPopup'>提交</van-button>
+
+<van-popup show="{{ show }}" bind:close="onClose">
+  <van-stepper value="{{ 1 }}" bind:change="onChange" />
+</van-popup>

@@ -1,0 +1,132 @@
+<!--pages/lease-end/lease-end.wxml-->
+<wxs src="./utils.wxs" module="utils" />
+
+<!-- Full Page Loading Overlay -->
+<van-overlay show="{{loading}}" z-index="1000">
+  <view class="loading-wrapper">
+    <van-loading type="spinner" size="48px" color="#1989fa" vertical>加载中...</van-loading>
+  </view>
+</van-overlay>
+
+<!-- Vehicle Information Section -->
+<view class="section vehicle-section">
+  <view class="section-title">车辆信息</view>
+  <van-loading wx:if="{{loading && !vehicleInfo.carname}}" type="spinner" size="24px" />
+  <van-card
+    wx:else
+    title="{{vehicleInfo.carname || '加载中...'}}"
+    thumb="{{vehicleInfo.cover_image.url}}"
+    tag="{{vehicleInfo.status == 0 ? '空闲中' : '租赁中'}}"
+  />
+</view>
+
+<!-- Rental Records Section -->
+<view class="section rental-records-section">
+  <view class="section-title">租赁记录</view>
+  <van-loading wx:if="{{loading && rentalRecords.length == 0}}" type="spinner" size="24px" />
+  <van-cell-group wx:else>
+    <van-cell
+      wx:for="{{rentalRecords}}"
+      wx:key="_id"
+      title="租客：{{item.renter_name || '未知租客'}}"
+      label="租期：{{utils.formatDate(item.start_time)}} - {{utils.formatDate(item.end_time)}}"
+      value="{{utils.formatStatus(item.status)}}"
+      is-link="{{false}}"
+    />
+    <van-cell wx:if="{{rentalRecords.length == 0 && !loading}}" title="暂无未结算的租赁记录" />
+  </van-cell-group>
+</view>
+
+<!-- Settlement Form Section -->
+<view class="section settlement-section">
+  <view class="section-title">结算信息</view>
+  
+  <!-- Photo Upload -->
+  <view class="form-item">
+    <view class="form-label">结算照片（最多3张）</view>
+    <van-uploader
+      file-list="{{settlementPhotos}}"
+      max-count="3"
+      multiple
+      bind:after-read="afterPhotoUpload"
+      bind:delete="deletePhoto"
+      accept="image"
+      max-size="{{5 * 1024 * 1024}}"
+      bind:oversize="onPhotoOversize"
+      disabled="{{loading || settlementProcessing}}"
+    />
+    <view class="upload-tip" wx:if="{{settlementPhotos.length >= 3}}">
+      已达到上传限制（3张）
+    </view>
+  </view>
+  
+  <!-- Settlement Notes -->
+  <view class="form-item">
+    <view class="form-label">结算备注</view>
+    <van-field
+      value="{{settlementNotes}}"
+      type="textarea"
+      placeholder="请输入结算备注（最多500字）"
+      maxlength="500"
+      show-word-limit
+      autosize
+      bind:input="onNotesChange"
+      disabled="{{loading || settlementProcessing}}"
+    />
+    <view class="notes-info">
+      <text class="char-count {{notesCharCount >= 450 ? 'warning' : ''}}">
+        {{notesCharCount}}/500
+      </text>
+      <text wx:if="{{notesCharCount >= 450}}" class="char-warning">
+        字符数接近限制
+      </text>
+    </view>
+  </view>
+  
+  <!-- Settlement Button -->
+  <view class="form-item">
+    <van-button
+      type="primary"
+      size="large"
+      loading="{{loading || settlementProcessing}}"
+      disabled="{{loading || settlementProcessing}}"
+      class="settlement-button"
+      bind:click="showSettlementDialog"
+    >
+      {{settlementProcessing ? '结算处理中...' : (loading ? '加载中...' : '确认结算')}}
+    </van-button>
+  </view>
+</view>
+
+<!-- Settlement Confirmation Dialog -->
+<van-dialog
+  show="{{showConfirmDialog}}"
+  title="确认结算"
+  show-cancel-button
+  confirm-button-text="确认结算"
+  cancel-button-text="取消"
+  bind:confirm="confirmSettlement"
+  bind:cancel="cancelSettlement"
+>
+  <view class="dialog-content">
+    <view class="dialog-item">
+      <text class="dialog-label">车辆名称：</text>
+      <text class="dialog-value">{{dialogSummary.vehicleName}}</text>
+    </view>
+    <view class="dialog-item">
+      <text class="dialog-label">待结算记录：</text>
+      <text class="dialog-value">{{dialogSummary.totalRecords}}条</text>
+    </view>
+    <view class="dialog-item">
+      <text class="dialog-label">结算照片：</text>
+      <text class="dialog-value">{{dialogSummary.photoCount}}张</text>
+    </view>
+    <view class="dialog-item">
+      <text class="dialog-label">结算备注：</text>
+      <text class="dialog-value">{{dialogSummary.hasNotes ? '已填写' : '未填写'}}</text>
+    </view>
+  </view>
+</van-dialog>
+
+<!-- Toast Component -->
+<van-toast id="van-toast" />

@@ -1,0 +1,34 @@
+
+<form catchsubmit="formSubmit">
+  <van-row gutter="20">
+    <van-col span="5" >
+      <van-uploader file-list="{{coverList}}" max-count="1" name="cover" bind:after-read="afterCover" bind:delete="deleteCover"/>
+    </van-col>
+    <van-col span="19" >
+      <van-cell-group>
+        <van-field
+          name="carname"
+          value="{{ carname }}"
+          clearable
+          label="车名"
+        />
+        <van-field
+          name="mark"
+          value="{{ mark }}"
+          type="textarea"
+          label="备注"
+        />
+      </van-cell-group>
+    </van-col>
+  </van-row>
+
+  <van-row>
+    <van-col offset="5" span="5"> 
+      <van-uploader file-list="{{fileList}}" max-count="5" bind:after-read="afterDetail" bind:delete="deleteDetail"/>
+    </van-col>
+  </van-row>
+
+  <van-row>
+    <van-button type="info" loading="{{load}}" form-type='submit'>提交</van-button>
+  </van-row>
+</form>

@@ -1,0 +1,1068 @@
+<!--pages/lease-new/lease-new.wxml-->
+<!-- Enhanced Step Progress Indicators -->
+<view class="step-progress-container">
+  <van-steps 
+    steps="{{ steps }}" 
+    active="{{ active }}" 
+    direction="horizontal"
+    active-color="#07c160"
+    inactive-color="#ebedf0"
+    custom-class="enhanced-steps"
+  />
+  
+  <!-- Detailed Step Status Indicators -->
+  <view class="step-status-details">
+    <view 
+      wx:for="{{stepDetails}}" 
+      wx:key="index" 
+      class="step-status-item {{item.isCurrentStep ? 'step-status-item--current' : ''}} {{item.isCompletedStep ? 'step-status-item--completed' : ''}}"
+    >
+      <view class="step-status-indicator">
+        <van-icon 
+          wx:if="{{item.showValidationIcon}}"
+          name="{{item.validationIcon}}" 
+          size="14px" 
+          color="{{item.validationColor}}" 
+        />
+        <view wx:else class="step-number">{{item.index + 1}}</view>
+      </view>
+      
+      <view class="step-status-content">
+        <text class="step-status-text" style="color: {{item.statusColor}}">
+          {{item.statusText}}
+        </text>
+        <view wx:if="{{item.errorCount > 0}}" class="step-error-count">
+          <van-tag type="warning" size="small">
+            <van-icon name="warning-o" size="10px" />
+            {{item.errorCount}}项待完善
+          </van-tag>
+        </view>
+        <!-- Success indicator -->
+        <view wx:if="{{item.isCompletedStep && item.errorCount === 0}}" class="step-success-indicator">
+          <van-tag type="success" size="small">
+            <van-icon name="success" size="10px" />
+            已完成
+          </van-tag>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- Enhanced Navigation Buttons with Smart State Management -->
+<van-row gutter="20" class="button-view">
+  <van-col span="6">
+    <van-button 
+      plain 
+      type="primary" 
+      size="small" 
+      bind:click="previousStep" 
+      wx:if="{{active>=1}}"
+      disabled="{{loading}}"
+      custom-class="nav-button nav-button--previous">
+      <van-icon name="arrow-left" size="14px" />
+      上一步
+    </van-button>
+    <view wx:else class="hadden-view">
+      <van-button 
+        plain 
+        type="primary" 
+        size="small" 
+        disabled
+        custom-class="nav-button nav-button--disabled">
+        <van-icon name="arrow-left" size="14px" />
+        上一步
+      </van-button>
+    </view>
+  </van-col>
+  <van-col span="6" offset="12">
+    <!-- Next Step Button -->
+    <view class="button-container" wx:if="{{active<=1}}">
+      <van-button 
+        plain 
+        type="primary" 
+        size="small" 
+        bind:click="nextStep" 
+        disabled="{{nextDisabled || loading}}"
+        loading="{{loading && loadingAction === 'next'}}"
+        custom-class="nav-button nav-button--next {{nextDisabled ? 'nav-button--disabled' : ''}}">
+        <van-icon wx:if="{{!loading || loadingAction !== 'next'}}" name="arrow" size="14px" />
+        <text class="button-text">下一步</text>
+      </van-button>
+      
+      <!-- Button state indicator with enhanced visual cues -->
+      <view wx:if="{{nextDisabled && !loading}}" class="button-state-hint">
+        <van-icon name="warning-o" size="12px" color="#ff976a" />
+        <text class="hint-text">请完善当前步骤信息</text>
+        <!-- Progress indicator -->
+        <view class="progress-dots">
+          <view class="dot {{validation.step0.valid ? 'dot--completed' : 'dot--pending'}}"></view>
+          <view class="dot {{validation.step1.valid ? 'dot--completed' : 'dot--pending'}}"></view>
+          <view class="dot {{validation.step2.valid ? 'dot--completed' : 'dot--pending'}}"></view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- Submit Button -->
+    <view class="button-container" wx:if="{{active==2}}">
+      <van-button 
+        type="info" 
+        size="small" 
+        bind:click="nextStep" 
+        disabled="{{submitDisabled || loading}}"
+        loading="{{loading && loadingAction === 'submit'}}"
+        custom-class="nav-button nav-button--submit {{submitDisabled ? 'nav-button--disabled' : ''}}">
+        <van-icon wx:if="{{!loading || loadingAction !== 'submit'}}" name="completed" size="14px" />
+        <text class="button-text">{{loading && loadingAction === 'submit' ? '处理中...' : '提交'}}</text>
+      </van-button>
+      
+      <!-- Submit button state indicator with enhanced visual feedback -->
+      <view wx:if="{{submitDisabled && !loading}}" class="button-state-hint">
+        <van-icon name="warning-o" size="12px" color="#ff976a" />
+        <text class="hint-text">请完善所有必填信息</text>
+        <!-- Checklist indicator -->
+        <view class="checklist-indicator">
+          <van-icon name="{{validation.step0.valid ? 'success' : 'close'}}" size="10px" color="{{validation.step0.valid ? '#07c160' : '#ee0a24'}}" />
+          <van-icon name="{{validation.step1.valid ? 'success' : 'close'}}" size="10px" color="{{validation.step1.valid ? '#07c160' : '#ee0a24'}}" />
+          <van-icon name="{{validation.step2.valid ? 'success' : 'close'}}" size="10px" color="{{validation.step2.valid ? '#07c160' : '#ee0a24'}}" />
+        </view>
+      </view>
+      
+      <!-- Submit ready indicator with celebration visual -->
+      <view wx:if="{{!submitDisabled && !loading}}" class="button-state-hint button-state-hint--ready">
+        <van-icon name="success" size="12px" color="#07c160" />
+        <text class="hint-text hint-text--ready">信息完整，可以提交</text>
+        <!-- Ready indicator animation -->
+        <view class="ready-indicator">
+          <van-icon name="fire-o" size="10px" color="#07c160" />
+        </view>
+      </view>
+    </view>
+  </van-col>
+</van-row>
+
+<!-- 修改车辆信息 -->
+<view wx:if="{{active == 0}}" class="content-row step-content step-content--enter">
+  <!-- Step transition wrapper -->
+  <view class="step-transition-wrapper" data-step="0">
+  <!-- Step validation summary with enhanced visual feedback -->
+  <view wx:if="{{validation.step0.errors.length > 0}}" class="step-error-summary">
+    <van-notice-bar
+      left-icon="warning-o"
+      text="请完善车辆信息中的必填项"
+      color="#ee0a24"
+      background="#fef0f0"
+      mode="closeable"
+    />
+    <!-- Error breakdown with icons -->
+    <view class="error-breakdown">
+      <view wx:for="{{validation.step0.errors}}" wx:key="field" class="error-item">
+        <van-icon name="close" size="12px" color="#ee0a24" />
+        <text class="error-text">{{item.message}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Enhanced Vehicle Information Card -->
+  <view class="vehicle-info-card">
+    <view class="card-header">
+      <van-icon name="car-o" size="20px" color="#1989fa" />
+      <text class="card-title">车辆信息</text>
+      <view class="card-status">
+        <van-tag 
+          type="{{validation.step0.valid ? 'success' : 'warning'}}" 
+          size="small">
+          <van-icon 
+            name="{{validation.step0.valid ? 'success' : 'warning-o'}}" 
+            size="10px" />
+          {{validation.step0.valid ? '信息完整' : '待完善'}}
+        </van-tag>
+        <!-- Change indicator with enhanced visual -->
+        <van-tag 
+          wx:if="{{changeTracking.vehicle.hasChanges}}"
+          type="primary" 
+          size="small"
+          custom-class="change-indicator">
+          <van-icon name="edit" size="10px" />
+          已修改
+        </van-tag>
+        <!-- Progress indicator -->
+        <view class="completion-indicator">
+          <view class="completion-bar">
+            <view class="completion-fill" style="width: {{validation.step0.completionPercentage || 0}}%"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Cover Image Upload Section -->
+    <view class="upload-section">
+      <view class="upload-header">
+        <van-icon name="photo-o" size="16px" color="#646566" />
+        <text class="upload-title">车辆封面图片</text>
+        <text class="upload-required">*</text>
+        <!-- Upload status indicator -->
+        <view class="upload-status-badge">
+          <van-tag 
+            type="{{cover_image.length > 0 ? 'success' : 'default'}}" 
+            size="small">
+            <van-icon 
+              name="{{cover_image.length > 0 ? 'photograph' : 'photo-o'}}" 
+              size="10px" />
+            {{cover_image.length > 0 ? '已上传' : '待上传'}}
+          </van-tag>
+        </view>
+      </view>
+      
+      <view class="cover-upload-container">
+        <van-uploader 
+          file-list="{{cover_image}}" 
+          custom-class="cover-uploader" 
+          max-count="1" 
+          bind:after-read="afterCover" 
+          bind:delete="deleteCover"
+          loading="{{uploadingCover}}"
+          upload-text="上传封面"
+        />
+        
+        <!-- Upload progress and status with enhanced loading animation -->
+        <view wx:if="{{uploadingCover}}" class="upload-progress upload-progress--enhanced">
+          <view class="loading-spinner">
+            <van-loading type="spinner" size="16px" color="#1989fa" />
+          </view>
+          <text class="progress-text">正在上传封面图片...</text>
+          <view class="progress-bar">
+            <view class="progress-fill"></view>
+          </view>
+        </view>
+        
+        <!-- Upload success status -->
+        <view wx:if="{{uploadProgress.cover && uploadProgress.cover.status === 'success'}}" class="upload-status upload-status--success">
+          <van-icon name="success" size="16px" color="#07c160" />
+          <text class="status-text">封面图片上传成功</text>
+        </view>
+        
+        <!-- Upload error status -->
+        <view wx:if="{{uploadProgress.cover && uploadProgress.cover.status === 'error'}}" class="upload-status upload-status--error">
+          <van-icon name="close" size="16px" color="#ee0a24" />
+          <text class="status-text">上传失败，请重试</text>
+        </view>
+        
+        <!-- Cover image validation feedback -->
+        <view wx:if="{{hasFieldError(0, 'cover_image')}}" class="field-error-message">
+          <van-tag type="danger" size="small">
+            <van-icon name="warning-o" size="12px" />
+            {{getFieldErrorMessage(0, 'cover_image')}}
+          </van-tag>
+        </view>
+        
+        <!-- Upload guidance -->
+        <view class="upload-guidance">
+          <text class="guidance-text">建议上传清晰的车辆正面照片</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Vehicle Details Form -->
+    <view class="form-section">
+      <van-cell-group custom-class="vehicle-form-group">
+        <van-field
+          value="{{car.carname}}"
+          label="车辆名称"
+          placeholder="请输入车辆名称（如：白色本田雅阁）"
+          bind:input="onCarNameInput"
+          bind:blur="recordCarName"
+          required
+          error="{{fieldValidation.carname && !fieldValidation.carname.valid}}"
+          error-message="{{fieldValidation.carname ? fieldValidation.carname.message : ''}}"
+          right-icon="{{fieldValidation.carname && fieldValidation.carname.valid ? 'success' : ''}}"
+          custom-class="vehicle-field"
+        />
+        
+        <!-- Enhanced validation guidance for car name -->
+        <view wx:if="{{hasFieldError(0, 'carname')}}" class="field-error-guidance">
+          <van-tag type="danger" size="small">
+            <van-icon name="warning-o" size="12px" />
+            {{getFieldErrorMessage(0, 'carname')}}
+          </van-tag>
+        </view>
+        
+        <van-field
+          value="{{car.mark}}"
+          type="textarea"
+          autosize
+          label="车辆备注"
+          placeholder="请输入车辆相关备注信息（选填）"
+          bind:input="onCarMarkInput"
+          bind:blur="recordMark"
+          error="{{fieldValidation.mark && !fieldValidation.mark.valid}}"
+          error-message="{{fieldValidation.mark ? fieldValidation.mark.message : ''}}"
+          right-icon="{{fieldValidation.mark && fieldValidation.mark.valid ? 'success' : ''}}"
+          custom-class="vehicle-field"
+          maxlength="100"
+          show-word-limit
+        />
+        
+        <!-- Enhanced validation guidance for car mark -->
+        <view wx:if="{{hasFieldError(0, 'mark')}}" class="field-error-guidance">
+          <van-tag type="danger" size="small">
+            <van-icon name="warning-o" size="12px" />
+            {{getFieldErrorMessage(0, 'mark')}}
+          </van-tag>
+        </view>
+      </van-cell-group>
+    </view>
+
+    <!-- Detail Images Upload Section -->
+    <view class="upload-section">
+      <view class="upload-header">
+        <van-icon name="photo" size="16px" color="#646566" />
+        <text class="upload-title">车辆详细图片</text>
+        <text class="upload-optional">（选填）</text>
+        <view class="upload-count">
+          <van-tag type="primary" size="small">
+            {{detail_image.length}}/5
+          </van-tag>
+        </view>
+      </view>
+      
+      <view class="detail-upload-container">
+        <van-uploader 
+          file-list="{{detail_image}}" 
+          max-count="5" 
+          bind:after-read="afterDetail" 
+          bind:delete="deleteDetail"
+          loading="{{uploadingDetail}}"
+          custom-class="detail-uploader"
+          upload-text="添加图片"
+        />
+        
+        <!-- Upload progress and status with enhanced loading animation -->
+        <view wx:if="{{uploadingDetail}}" class="upload-progress upload-progress--enhanced">
+          <view class="loading-spinner">
+            <van-loading type="spinner" size="16px" color="#1989fa" />
+          </view>
+          <text class="progress-text">正在上传详细图片...</text>
+          <view class="progress-bar">
+            <view class="progress-fill"></view>
+          </view>
+        </view>
+        
+        <!-- Upload success status -->
+        <view wx:if="{{uploadProgress.detail && uploadProgress.detail.status === 'success'}}" class="upload-status upload-status--success">
+          <van-icon name="success" size="16px" color="#07c160" />
+          <text class="status-text">图片上传成功</text>
+        </view>
+        
+        <!-- Upload error status -->
+        <view wx:if="{{uploadProgress.detail && uploadProgress.detail.status === 'error'}}" class="upload-status upload-status--error">
+          <van-icon name="close" size="16px" color="#ee0a24" />
+          <text class="status-text">上传失败，请重试</text>
+        </view>
+        
+        <!-- Detail images validation feedback -->
+        <view wx:if="{{hasFieldError(0, 'detail_image')}}" class="field-error-message">
+          <van-tag type="danger" size="small">
+            <van-icon name="warning-o" size="12px" />
+            {{getFieldErrorMessage(0, 'detail_image')}}
+          </van-tag>
+        </view>
+        
+        <!-- Upload guidance -->
+        <view class="upload-guidance">
+          <text class="guidance-text">可上传车辆内饰、外观等详细照片，最多5张</text>
+        </view>
+      </view>
+    </view>
+  </view>
+  <!-- End step transition wrapper -->
+  </view>
+</view>
+
+<!-- 填写租车人信息 -->
+<view wx:if="{{active == 1}}" class="content-row step-content step-content--enter">
+  <!-- Step transition wrapper -->
+  <view class="step-transition-wrapper" data-step="1">
+  <!-- Step validation summary -->
+  <view wx:if="{{validation.step1.errors.length > 0}}" class="step-error-summary">
+    <van-notice-bar
+      left-icon="warning-o"
+      text="请完善租车人信息中的必填项"
+      color="#ee0a24"
+      background="#fef0f0"
+    />
+  </view>
+
+  <!-- Enhanced Renter Information Card -->
+  <view class="renter-info-card">
+    <view class="card-header">
+      <van-icon name="contact" size="20px" color="#1989fa" />
+      <text class="card-title">租车人信息</text>
+      <view class="card-status">
+        <van-tag 
+          type="{{validation.step1.valid ? 'success' : 'warning'}}" 
+          size="small">
+          {{validation.step1.valid ? '信息完整' : '待完善'}}
+        </van-tag>
+      </view>
+    </view>
+
+    <!-- Renter Details Form Section -->
+    <view class="form-section">
+      <van-cell-group custom-class="renter-form-group">
+        <van-field
+          label="租车人姓名"
+          value="{{ renter.name }}"
+          placeholder="请输入租车人真实姓名"
+          bind:input="onRenterNameInput"
+          bind:change="onRenterNameChange"
+          required
+          error="{{fieldValidation.renter_name && !fieldValidation.renter_name.valid}}"
+          error-message="{{fieldValidation.renter_name ? fieldValidation.renter_name.message : ''}}"
+          right-icon="{{fieldValidation.renter_name && fieldValidation.renter_name.valid ? 'success' : ''}}"
+          custom-class="renter-field"
+          maxlength="20"
+          show-word-limit
+        />
+        
+        <!-- Enhanced validation guidance for renter name -->
+        <view wx:if="{{hasFieldError(1, 'name')}}" class="field-error-guidance">
+          <van-tag type="danger" size="small">
+            <van-icon name="warning-o" size="12px" />
+            {{getFieldErrorMessage(1, 'name')}}
+          </van-tag>
+        </view>
+      </van-cell-group>
+    </view>
+
+    <!-- ID Card Upload Section -->
+    <view class="upload-section">
+      <view class="upload-header">
+        <van-icon name="idcard" size="16px" color="#646566" />
+        <text class="upload-title">身份证照片</text>
+        <text class="upload-required">*</text>
+        <view class="upload-count">
+          <van-tag 
+            type="{{renter.id_card_image.length === 2 ? 'success' : 'warning'}}"
+            size="small">
+            {{renter.id_card_image.length}}/2
+          </van-tag>
+        </view>
+      </view>
+      
+      <!-- Enhanced ID card status with validation feedback -->
+      <view class="id-card-status-container">
+        <view class="id-card-status">
+          <van-tag 
+            type="{{renter.id_card_image.length === 2 ? 'success' : 'warning'}}"
+            size="medium"
+            custom-class="status-tag">
+            <van-icon 
+              name="{{renter.id_card_image.length === 2 ? 'success' : 'warning-o'}}" 
+              size="14px" />
+            {{renter.id_card_image.length === 2 ? '已上传正反两面' : '需要上传身份证正反两面'}}
+          </van-tag>
+        </view>
+        
+        <!-- ID card validation error display -->
+        <view wx:if="{{hasFieldError(1, 'id_card_image')}}" class="field-error-guidance">
+          <van-tag type="danger" size="small">
+            <van-icon name="warning-o" size="12px" />
+            {{getFieldErrorMessage(1, 'id_card_image')}}
+          </van-tag>
+        </view>
+      </view>
+      
+      <!-- Enhanced ID card upload guidance -->
+      <view class="id-card-guidance">
+        <view class="guidance-item {{renter.id_card_image.length >= 1 ? 'guidance-item--completed' : ''}}">
+          <view class="guidance-icon">
+            <van-icon 
+              name="{{renter.id_card_image.length >= 1 ? 'success' : 'photo-o'}}" 
+              color="{{renter.id_card_image.length >= 1 ? '#07c160' : '#969799'}}"
+              size="18px" />
+          </view>
+          <view class="guidance-content">
+            <text class="guidance-title">身份证正面</text>
+            <text class="guidance-desc">包含头像和个人信息</text>
+          </view>
+          <view class="guidance-status">
+            <van-tag 
+              type="{{renter.id_card_image.length >= 1 ? 'success' : 'default'}}"
+              size="small">
+              {{renter.id_card_image.length >= 1 ? '已上传' : '待上传'}}
+            </van-tag>
+          </view>
+        </view>
+        
+        <view class="guidance-item {{renter.id_card_image.length >= 2 ? 'guidance-item--completed' : ''}}">
+          <view class="guidance-icon">
+            <van-icon 
+              name="{{renter.id_card_image.length >= 2 ? 'success' : 'photo-o'}}" 
+              color="{{renter.id_card_image.length >= 2 ? '#07c160' : '#969799'}}"
+              size="18px" />
+          </view>
+          <view class="guidance-content">
+            <text class="guidance-title">身份证反面</text>
+            <text class="guidance-desc">包含国徽和有效期</text>
+          </view>
+          <view class="guidance-status">
+            <van-tag 
+              type="{{renter.id_card_image.length >= 2 ? 'success' : 'default'}}"
+              size="small">
+              {{renter.id_card_image.length >= 2 ? '已上传' : '待上传'}}
+            </van-tag>
+          </view>
+        </view>
+      </view>
+      
+      <!-- ID Card Upload Container -->
+      <view class="id-card-upload-container">
+        <!-- Separate upload areas for front and back -->
+        <view class="separate-upload-areas">
+          <!-- Front ID Card Upload -->
+          <view class="upload-area {{renter.id_card_image.length >= 1 ? 'upload-area--completed' : ''}}">
+            <view class="upload-area-header">
+              <van-icon name="idcard" size="16px" color="#646566" />
+              <text class="upload-area-title">身份证正面</text>
+              <van-tag 
+                type="{{renter.id_card_image.length >= 1 ? 'success' : 'default'}}"
+                size="small">
+                {{renter.id_card_image.length >= 1 ? '已上传' : '待上传'}}
+              </van-tag>
+            </view>
+            
+            <view class="upload-area-content">
+              <view wx:if="{{renter.id_card_image.length === 0}}" class="upload-placeholder">
+                <van-uploader 
+                  max-count="1" 
+                  bind:after-read="afterRenterDetail" 
+                  loading="{{uploadingIdCard}}"
+                  custom-class="single-id-uploader"
+                  upload-text="上传正面"
+                />
+              </view>
+              
+              <view wx:if="{{renter.id_card_image.length >= 1}}" class="uploaded-preview">
+                <image 
+                  src="{{renter.id_card_image[0].url}}" 
+                  class="id-preview-image"
+                  mode="aspectFill" />
+                <view class="preview-actions">
+                  <van-button 
+                    size="mini" 
+                    type="danger" 
+                    bind:click="deleteSpecificIdCard"
+                    data-index="0"
+                    custom-class="delete-btn">
+                    删除
+                  </van-button>
+                </view>
+              </view>
+            </view>
+          </view>
+          
+          <!-- Back ID Card Upload -->
+          <view class="upload-area {{renter.id_card_image.length >= 2 ? 'upload-area--completed' : ''}}">
+            <view class="upload-area-header">
+              <van-icon name="idcard" size="16px" color="#646566" />
+              <text class="upload-area-title">身份证反面</text>
+              <van-tag 
+                type="{{renter.id_card_image.length >= 2 ? 'success' : 'default'}}"
+                size="small">
+                {{renter.id_card_image.length >= 2 ? '已上传' : '待上传'}}
+              </van-tag>
+            </view>
+            
+            <view class="upload-area-content">
+              <view wx:if="{{renter.id_card_image.length < 2}}" class="upload-placeholder">
+                <van-uploader 
+                  max-count="1" 
+                  bind:after-read="afterRenterDetail" 
+                  loading="{{uploadingIdCard}}"
+                  custom-class="single-id-uploader"
+                  upload-text="上传反面"
+                  disabled="{{renter.id_card_image.length === 0}}"
+                />
+                
+                <view wx:if="{{renter.id_card_image.length === 0}}" class="upload-disabled-hint">
+                  <text class="hint-text">请先上传身份证正面</text>
+                </view>
+              </view>
+              
+              <view wx:if="{{renter.id_card_image.length >= 2}}" class="uploaded-preview">
+                <image 
+                  src="{{renter.id_card_image[1].url}}" 
+                  class="id-preview-image"
+                  mode="aspectFill" />
+                <view class="preview-actions">
+                  <van-button 
+                    size="mini" 
+                    type="danger" 
+                    bind:click="deleteSpecificIdCard"
+                    data-index="1"
+                    custom-class="delete-btn">
+                    删除
+                  </van-button>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <!-- Fallback: Traditional uploader for compatibility -->
+        <view wx:if="{{false}}" class="traditional-uploader">
+          <van-uploader 
+            file-list="{{renter.id_card_image}}" 
+            max-count="2" 
+            bind:after-read="afterRenterDetail" 
+            bind:delete="deleteRenterDetail"
+            loading="{{uploadingIdCard}}"
+            custom-class="id-card-uploader"
+            upload-text="上传身份证"
+          />
+        </view>
+        
+        <!-- Upload progress and status with enhanced loading animation -->
+        <view wx:if="{{uploadingIdCard}}" class="upload-progress upload-progress--enhanced">
+          <view class="loading-spinner">
+            <van-loading type="spinner" size="16px" color="#1989fa" />
+          </view>
+          <text class="progress-text">正在上传身份证照片...</text>
+          <view class="progress-bar">
+            <view class="progress-fill"></view>
+          </view>
+        </view>
+        
+        <!-- Upload success status -->
+        <view wx:if="{{uploadProgress.id_card && uploadProgress.id_card.status === 'success'}}" class="upload-status upload-status--success">
+          <van-icon name="success" size="16px" color="#07c160" />
+          <text class="status-text">身份证照片上传成功</text>
+        </view>
+        
+        <!-- Upload error status -->
+        <view wx:if="{{uploadProgress.id_card && uploadProgress.id_card.status === 'error'}}" class="upload-status upload-status--error">
+          <van-icon name="close" size="16px" color="#ee0a24" />
+          <text class="status-text">上传失败，请重试</text>
+        </view>
+        
+        <!-- Upload validation messages -->
+        <view class="upload-validation-messages">
+          <view wx:if="{{renter.id_card_image.length > 2}}" class="validation-message validation-message--error">
+            <van-icon name="warning-o" size="14px" color="#ee0a24" />
+            <text class="message-text">身份证照片只能上传正反两面，请删除多余照片</text>
+          </view>
+          
+          <view wx:if="{{renter.id_card_image.length === 1}}" class="validation-message validation-message--warning">
+            <van-icon name="info-o" size="14px" color="#ff976a" />
+            <text class="message-text">请继续上传身份证反面照片</text>
+          </view>
+          
+          <view wx:if="{{renter.id_card_image.length === 2}}" class="validation-message validation-message--success">
+            <van-icon name="success" size="14px" color="#07c160" />
+            <text class="message-text">身份证正反两面已上传完成</text>
+          </view>
+        </view>
+        
+        <!-- Upload guidance -->
+        <view class="upload-guidance">
+          <text class="guidance-text">请确保身份证照片清晰可见，包含完整信息</text>
+        </view>
+      </view>
+    </view>
+  </view>
+  <!-- End step transition wrapper -->
+  </view>
+</view>
+
+<!-- 填写租聘信息 -->
+<view wx:if="{{active == 2}}" class="content-row step-content step-content--enter">
+  <!-- Step transition wrapper -->
+  <view class="step-transition-wrapper" data-step="2">
+  <!-- Step validation summary -->
+  <view wx:if="{{validation.step2.errors.length > 0}}" class="step-error-summary">
+    <van-notice-bar
+      left-icon="warning-o"
+      text="请完善租赁信息中的必填项"
+      color="#ee0a24"
+      background="#fef0f0"
+    />
+  </view>
+
+  <!-- Enhanced Lease Information Card -->
+  <view class="lease-info-card">
+    <view class="card-header">
+      <van-icon name="calendar-o" size="20px" color="#1989fa" />
+      <text class="card-title">租赁信息</text>
+      <view class="card-status">
+        <van-tag 
+          type="{{validation.step2.valid ? 'success' : 'warning'}}" 
+          size="small">
+          {{validation.step2.valid ? '信息完整' : '待完善'}}
+        </van-tag>
+      </view>
+    </view>
+
+    <!-- Lease Information Form Section -->
+    <view class="form-section">
+      <van-cell-group custom-class="lease-form-group">
+        <!-- Start Time Selection -->
+        <van-cell 
+          title="租聘起始时间" 
+          is-link 
+          value="{{ rent_info.start_format_time || '请选择开始时间' }}" 
+          bind:click="onDisplayDate"
+          required
+          title-class="{{hasFieldError(2, 'start_time') ? 'field-error-title' : ''}}"
+          custom-class="lease-field {{rent_info.start_format_time ? 'lease-field--filled' : ''}}"
+        >
+          <view slot="icon" class="field-icon-container">
+            <van-icon name="clock-o" size="18px" color="{{rent_info.start_format_time ? '#07c160' : '#969799'}}" />
+          </view>
+        </van-cell>
+        
+        <!-- Enhanced start time validation feedback -->
+        <view wx:if="{{fieldValidation.start_time && !fieldValidation.start_time.valid}}" class="field-error-message">
+          <van-tag type="danger" size="small">
+            <van-icon name="warning-o" size="12px" />
+            {{fieldValidation.start_time.message}}
+          </van-tag>
+        </view>
+        <view wx:if="{{hasFieldError(2, 'start_time')}}" class="field-error-guidance">
+          <van-tag type="danger" size="small">
+            <van-icon name="warning-o" size="12px" />
+            {{getFieldErrorMessage(2, 'start_time')}}
+          </van-tag>
+        </view>
+        
+        <!-- Start time selection guidance -->
+        <view wx:if="{{!rent_info.start_format_time}}" class="field-guidance">
+          <van-icon name="info-o" size="14px" color="#969799" />
+          <text class="guidance-text">请选择租赁开始的日期和时间</text>
+        </view>
+        <view wx:if="{{rent_info.start_format_time}}" class="field-success-indicator">
+          <van-icon name="success" size="14px" color="#07c160" />
+          <text class="success-text">开始时间已设置</text>
+        </view>
+
+        <!-- Duration Selection -->
+        <van-cell 
+          title="租聘时长" 
+          is-link 
+          value = "{{rent_info.duration_picker_time || '请选择租赁时长'}}" 
+          bind:click="onDisplayRange"
+          required
+          title-class="{{hasFieldError(2, 'duration') ? 'field-error-title' : ''}}"
+          custom-class="lease-field {{rent_info.duration_picker_time ? 'lease-field--filled' : ''}}"
+        >
+          <view slot="icon" class="field-icon-container">
+            <van-icon name="records-o" size="18px" color="{{rent_info.duration_picker_time ? '#07c160' : '#969799'}}" />
+          </view>
+        </van-cell>
+        
+        <!-- Enhanced duration validation feedback -->
+        <view wx:if="{{fieldValidation.duration && !fieldValidation.duration.valid}}" class="field-error-message">
+          <van-tag type="danger" size="small">
+            <van-icon name="warning-o" size="12px" />
+            {{fieldValidation.duration.message}}
+          </van-tag>
+        </view>
+        <view wx:if="{{hasFieldError(2, 'duration')}}" class="field-error-guidance">
+          <van-tag type="danger" size="small">
+            <van-icon name="warning-o" size="12px" />
+            {{getFieldErrorMessage(2, 'duration')}}
+          </van-tag>
+        </view>
+        
+        <!-- Duration selection guidance -->
+        <view wx:if="{{!rent_info.duration_picker_time}}" class="field-guidance">
+          <van-icon name="info-o" size="14px" color="#969799" />
+          <text class="guidance-text">请选择租赁的年、月、日时长</text>
+        </view>
+        <view wx:if="{{rent_info.duration_picker_time}}" class="field-success-indicator">
+          <van-icon name="success" size="14px" color="#07c160" />
+          <text class="success-text">租赁时长已设置</text>
+        </view>
+
+        <!-- End Time Display (Auto-calculated) -->
+        <van-cell 
+          title="到期时间" 
+          value = "{{rent_info.timeout || '自动计算'}}"
+          title-class="{{hasFieldError(2, 'end_time') ? 'field-error-title' : ''}}"
+          custom-class="lease-field lease-field--readonly {{rent_info.timeout ? 'lease-field--filled' : ''}}"
+        >
+          <view slot="icon" class="field-icon-container">
+            <van-icon name="flag-o" size="18px" color="{{rent_info.timeout ? '#07c160' : '#969799'}}" />
+          </view>
+          <view slot="right-icon" wx:if="{{rent_info.timeout}}" class="end-date-indicator">
+            <van-tag type="success" size="small">
+              <van-icon name="clock-o" size="12px" />
+              自动计算
+            </van-tag>
+          </view>
+        </van-cell>
+        
+        <!-- End time validation and success feedback -->
+        <view wx:if="{{rent_info.timeout}}" class="field-success-message">
+          <van-tag type="success" size="small">
+            <van-icon name="success" size="12px" />
+            自动计算的到期时间
+          </van-tag>
+        </view>
+        <view wx:if="{{hasFieldError(2, 'end_time')}}" class="field-error-guidance">
+          <van-tag type="danger" size="small">
+            <van-icon name="warning-o" size="12px" />
+            {{getFieldErrorMessage(2, 'end_time')}}
+          </van-tag>
+        </view>
+        
+        <!-- End time calculation guidance -->
+        <view wx:if="{{!rent_info.timeout}}" class="field-guidance">
+          <van-icon name="info-o" size="14px" color="#969799" />
+          <text class="guidance-text">到期时间将根据开始时间和租赁时长自动计算</text>
+        </view>
+        
+        <!-- Real-time calculation display -->
+        <view wx:if="{{rent_info.start_format_time && rent_info.duration_picker_time && !rent_info.timeout}}" class="calculation-in-progress">
+          <van-loading type="spinner" size="14px" color="#1989fa" />
+          <text class="calculation-text">正在计算到期时间...</text>
+        </view>
+        
+        <!-- Calculation details display -->
+        <view wx:if="{{endDateCalculation && endDateCalculation.isValid}}" class="calculation-details">
+          <view class="calculation-summary">
+            <van-icon name="info-o" size="14px" color="#1989fa" />
+            <text class="calculation-text">
+              租期共 {{endDateCalculation.totalDays}} 天
+            </text>
+          </view>
+        </view>
+      </van-cell-group>
+    </view>
+
+    <!-- Lease Summary Display -->
+    <view wx:if="{{rent_info.start_format_time && rent_info.duration_picker_time && rent_info.timeout}}" class="lease-summary">
+      <view class="summary-header">
+        <van-icon name="description" size="16px" color="#1989fa" />
+        <text class="summary-title">租赁期限概览</text>
+      </view>
+      <view class="summary-content">
+        <view class="summary-item">
+          <view class="summary-label">开始</view>
+          <view class="summary-value">{{rent_info.start_format_time}}</view>
+        </view>
+        <view class="summary-divider">
+          <van-icon name="arrow" size="16px" color="#969799" />
+          <text class="divider-text">{{rent_info.duration_picker_time}}</text>
+        </view>
+        <view class="summary-item">
+          <view class="summary-label">结束</view>
+          <view class="summary-value">{{rent_info.timeout}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- Enhanced Date Picker Popup -->
+  <van-popup
+    show="{{ date_show }}"
+    position="bottom"
+    custom-style="height: 45%; border-radius: 16px 16px 0 0;"
+    round
+    closeable
+    close-icon="close"
+    bind:close="onCloseDate">
+    <view class="picker-header">
+      <text class="picker-title">选择租赁开始时间</text>
+      <text class="picker-subtitle">请选择未来的日期和时间</text>
+    </view>
+    <van-datetime-picker
+      formatter="{{formatter}}"
+      bind:cancel="onCloseDate"
+      type="datetime"
+      value="{{rent_info.picker_time}}"
+      min-date="{{minDate}}"
+      max-date="{{maxDate}}"
+      bind:input="onInput"
+      bind:confirm="onConfirmDate"
+      custom-class="enhanced-datetime-picker"
+    />  
+  </van-popup>
+
+  <!-- Enhanced Duration Picker Popup -->
+  <van-popup
+    show="{{ range_show }}"
+    position="bottom"
+    custom-style="height: 45%; border-radius: 16px 16px 0 0;"
+    round
+    closeable
+    close-icon="close"
+    bind:close="onCancelRange">
+    <view class="picker-header">
+      <text class="picker-title">选择租赁时长</text>
+      <text class="picker-subtitle">请选择年、月、日的租赁期限</text>
+    </view>
+    <van-picker 
+      columns="{{ columns }}" 
+      show-toolbar 
+      bind:confirm="onConfirmRange" 
+      bind:cancel="onCancelRange"
+      custom-class="enhanced-duration-picker"
+    />
+  </van-popup>
+  </view>
+</view>
+
+<!-- Enhanced Lease Confirmation Dialog -->
+<van-dialog
+  show="{{ showConfirmDialog }}"
+  title="确认租赁信息"
+  show-cancel-button
+  bind:confirm="confirmLeaseCreation"
+  bind:cancel="hideConfirmDialog"
+  confirm-button-text="确认创建"
+  cancel-button-text="取消"
+  confirm-button-color="#07c160"
+  custom-class="lease-confirmation-dialog"
+  width="90%">
+  
+  <view class="confirmation-content">
+    <!-- Dialog Header with Icon -->
+    <view class="confirmation-header">
+      <van-icon name="info-o" size="24px" color="#1989fa" />
+      <text class="header-text">请确认以下租赁信息无误后提交</text>
+    </view>
+    
+    <!-- Vehicle Information Section -->
+    <view class="confirmation-section">
+      <view class="section-header">
+        <van-icon name="car-o" size="18px" color="#1989fa" />
+        <text class="section-title">车辆信息</text>
+        <van-tag 
+          wx:if="{{confirmationData.vehicle.hasChanges}}"
+          type="primary" 
+          size="small"
+          custom-class="change-indicator">
+          已修改
+        </van-tag>
+      </view>
+      
+      <view class="section-content">
+        <view class="info-row">
+          <text class="info-label">车辆名称</text>
+          <text class="info-value">{{confirmationData.vehicle.name}}</text>
+        </view>
+        
+        <view wx:if="{{confirmationData.vehicle.mark}}" class="info-row">
+          <text class="info-label">车辆备注</text>
+          <text class="info-value">{{confirmationData.vehicle.mark}}</text>
+        </view>
+        
+        <view class="info-row">
+          <text class="info-label">封面图片</text>
+          <text class="info-value">{{confirmationData.vehicle.cover_image.length}}张</text>
+        </view>
+        
+        <view class="info-row">
+          <text class="info-label">详细图片</text>
+          <text class="info-value">{{confirmationData.vehicle.detail_image.length}}张</text>
+        </view>
+        
+        <!-- Vehicle changes summary -->
+        <view wx:if="{{confirmationData.vehicle.hasChanges}}" class="changes-summary">
+          <view class="changes-header">
+            <van-icon name="edit" size="14px" color="#ff976a" />
+            <text class="changes-title">本次修改内容</text>
+          </view>
+          <view class="changes-list">
+            <view wx:for="{{confirmationData.vehicle.changesSummary}}" wx:key="field" class="change-item">
+              <view class="change-field">{{item.field}}</view>
+              <view class="change-details">
+                <text class="change-old">{{item.oldValue}}</text>
+                <van-icon name="arrow" size="12px" color="#969799" />
+                <text class="change-new">{{item.newValue}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- Renter Information Section -->
+    <view class="confirmation-section">
+      <view class="section-header">
+        <van-icon name="contact" size="18px" color="#1989fa" />
+        <text class="section-title">租车人信息</text>
+      </view>
+      
+      <view class="section-content">
+        <view class="info-row">
+          <text class="info-label">租车人姓名</text>
+          <text class="info-value">{{confirmationData.renter.name}}</text>
+        </view>
+        
+        <view class="info-row">
+          <text class="info-label">身份证照片</text>
+          <view class="info-value-with-status">
+            <text class="info-value">{{confirmationData.renter.id_card_count}}/2张</text>
+            <van-tag 
+              type="{{confirmationData.renter.id_card_count === 2 ? 'success' : 'warning'}}" 
+              size="small">
+              {{confirmationData.renter.id_card_status}}
+            </van-tag>
+          </view>
+        </view>
+        
+        <!-- ID verification status -->
+        <view class="verification-status">
+          <van-icon 
+            name="{{confirmationData.renter.id_card_count === 2 ? 'success' : 'warning-o'}}" 
+            size="14px" 
+            color="{{confirmationData.renter.id_card_count === 2 ? '#07c160' : '#ff976a'}}" />
+          <text class="status-text">
+            {{confirmationData.renter.id_card_count === 2 ? '身份证验证完整' : '身份证信息不完整'}}
+          </text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- Lease Information Section -->
+    <view class="confirmation-section">
+      <view class="section-header">
+        <van-icon name="calendar-o" size="18px" color="#1989fa" />
+        <text class="section-title">租赁信息</text>
+      </view>
+      
+      <view class="section-content">
+        <view class="info-row">
+          <text class="info-label">开始时间</text>
+          <text class="info-value">{{confirmationData.lease.start_time}}</text>
+        </view>
+        
+        <view class="info-row">
+          <text class="info-label">租赁时长</text>
+          <text class="info-value">{{confirmationData.lease.duration}}</text>
+        </view>
+        
+        <view class="info-row">
+          <text class="info-label">到期时间</text>
+          <text class="info-value">{{confirmationData.lease.end_time}}</text>
+        </view>
+        
+        <!-- Lease duration summary -->
+        <view wx:if="{{confirmationData.lease.totalDays}}" class="duration-summary">
+          <van-icon name="clock-o" size="14px" color="#1989fa" />
+          <text class="summary-text">租期共 {{confirmationData.lease.totalDays}} 天</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- Confirmation Footer -->
+    <view class="confirmation-footer">
+      <view class="footer-notice">
+        <van-icon name="warning-o" size="16px" color="#ff976a" />
+        <text class="notice-text">请仔细核对以上信息，确认无误后点击"确认创建"</text>
+      </view>
+    </view>
+  </view>
+</van-dialog>

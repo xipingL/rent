@@ -1,0 +1,26 @@
+<!--pages/garage/garage.wxml-->
+
+<van-card
+  wx:for="{{carList}}"
+  wx:key="_id"
+  price="2.00/天"
+  tag="{{item.status==0 ? '空闲中' : '租凭中'}}"
+  title="{{item.carname}}"
+  thumb="{{item.cover_image.url}}"
+>
+  <view slot="footer">
+    <van-button class="footer-button" size="mini" id="{{item._id}}" bind:click="turnToEditCar">编辑</van-button>
+    <van-button class="footer-button" wx:if="{{item.status==0}}" id="{{item._id}}" size="mini" bind:click="turnToLeaseNew">租聘</van-button>
+    <van-button class="footer-button" wx:if="{{item.status==1}}" id="{{item._id}}" size="mini" bind:click="turnToLeaseExtend">续租</van-button>
+    <van-button class="footer-button" wx:if="{{item.status==1}}" id="{{item._id}}" size="mini" bind:click="turnToLeaseEnd">结算</van-button>
+    <van-button class="footer-button" size="mini" id="{{item._id}}" data-name="{{item.carname}}" bind:click="deleteCar">删除</van-button>
+  </view>
+</van-card>
+<van-button type="primary" class="test" size="small" bind:click="turnToCreateCar">新增</van-button>
+
+<van-dialog	id="van-dialog" show="{{show}}" message="确认删除车辆 {{willDeleteCar.carname}} ?" show-cancel-button="true" bind:close="onClose" bind:confirm="sureDialog" />
+
+
+<van-empty description="暂无车辆" wx:if="{{empty}}">
+  <van-button round type="danger" class="bottom-button" bind:click="turnToCreateCar">新增</van-button>
+</van-empty>

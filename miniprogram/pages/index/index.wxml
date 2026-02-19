@@ -1,0 +1,20 @@
+<van-row gutter="20">
+  <van-col span="8" offset="4" custom-class="vcol-center">
+    <van-button plain type="info" bind:click="navigateToGarage">我的车库</van-button>
+  </van-col>
+  <van-col span="8" custom-class="vcol-center">
+    <van-circle value="{{rate}}" text="{{showText}}" />
+  </van-col>
+</van-row>
+
+<van-row gutter="20" custom-class="button-block">
+  <van-col span="5" offset="2" custom-class="vcol-center">
+    <van-button plain type="info">新租</van-button>
+  </van-col>
+  <van-col span="5" offset="2" custom-class="vcol-center">
+    <van-button plain type="info">续租</van-button>
+  </van-col>
+  <van-col span="5" offset="2" custom-class="vcol-center">
+    <van-button plain type="info">退租</van-button>
+  </van-col>
+</van-row>

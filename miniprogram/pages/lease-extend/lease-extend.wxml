@@ -1,0 +1,18 @@
+<!--pages/lease-extend/lease-extend.wxml-->
+<van-divider contentPosition="center"> 车辆信息 </van-divider>
+<van-row gutter="20" >
+    <van-col span="6" >
+        <van-image width="100" height="100" src="{{car.cover_image.url}}"></van-image>
+    </van-col>
+    <van-col span="16">
+        <van-cell-group>
+            <van-cell title-width="60rpx"	title="车名" value="{{car.carname}}" />
+            <van-cell title-width="60rpx"	title="备注" value="{{car.mark}}"/>
+        </van-cell-group>
+    </van-col>
+</van-row>
+<van-divider contentPosition="center"> 租聘信息 </van-divider>
+    <van-cell-group>
+        <van-cell title-width="60rpx"	title="起始时间" value="{{car.carname}}" />
+        <van-cell title-width="60rpx"	title="截止时间" value="{{car.mark}}"/>
+    </van-cell-group>

@@ -1,0 +1,9 @@
+.vcol-center {
+  display: inline-flex;   /* 让 col 本身变成 flex 容器 */
+  align-items: center;    /* 垂直居中 */
+  justify-content: center;/* 水平也居中，可选 */
+  height: 200rpx;         /* 必须给高度 */
+}
+.button-block {
+  margin-top: 50rpx;
+}
