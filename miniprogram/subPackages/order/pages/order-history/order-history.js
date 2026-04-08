@@ -4,7 +4,8 @@ Page({
     searchText: '',
     startTime: '',
     endTime: '',
-    orders: []
+    orders: [],
+    allOrders: []  // 保存原始订单数据用于搜索
   },
 
   onLoad() {
@@ -48,7 +49,9 @@ Page({
         orders = orders.map(order => {
           if (carMap[order.carId]) {
             order.name = carMap[order.carId].name
+            order.brand = carMap[order.carId].brand
             order.plateNo = carMap[order.carId].plateNo
+            order.carNote = carMap[order.carId].note
             order.carImage = carMap[order.carId].image || ''
           }
           // 如果是续租订单，从父订单获取用户信息
@@ -66,7 +69,8 @@ Page({
       wx.hideLoading()
 
       this.setData({
-        orders: orders
+        orders: orders,
+        allOrders: orders
       })
     } catch (err) {
       wx.hideLoading()
@@ -89,20 +93,53 @@ Page({
 
   // 搜索
   onSearch() {
-    const { searchText, orders } = this.data
-    if (!searchText) {
+    const { searchText, startTime, endTime, allOrders } = this.data
+
+    // 如果没有搜索条件，重新加载所有订单
+    if (!searchText && !startTime && !endTime) {
       this.loadOrders()
       return
     }
 
-    // 按关键词筛选
-    const filtered = orders.filter(order => {
-      const keyword = searchText.toLowerCase()
-      return (
-        (order.name && order.name.toLowerCase().includes(keyword)) ||
-        (order.plateNo && order.plateNo.toLowerCase().includes(keyword)) ||
-        (order.renterName && order.renterName.toLowerCase().includes(keyword))
-      )
+    // 筛选订单（基于原始订单数据）
+    const filtered = allOrders.filter(order => {
+      // 关键词筛选（模糊匹配）
+      let keywordMatch = true
+      if (searchText) {
+        const keyword = searchText.toLowerCase()
+        keywordMatch = (
+          (order.renterName && order.renterName.toLowerCase().includes(keyword)) ||
+          (order.remark && order.remark.toLowerCase().includes(keyword)) ||
+          (order.renterPhone && order.renterPhone.toLowerCase().includes(keyword)) ||
+          (order.name && order.name.toLowerCase().includes(keyword)) ||
+          (order.brand && order.brand.toLowerCase().includes(keyword)) ||
+          (order.plateNo && order.plateNo.toLowerCase().includes(keyword)) ||
+          (order.carNote && order.carNote.toLowerCase().includes(keyword))
+        )
+      }
+
+      // 日期筛选
+      let dateMatch = true
+      if (startTime || endTime) {
+        // 提取订单的开始和到期日期（只取年月日部分）
+        const orderStart = order.startTime ? order.startTime.split(' ')[0] : ''
+        const orderExpire = order.expireTime ? order.expireTime.split(' ')[0] : ''
+
+        if (startTime && endTime) {
+          // 两者都有：订单时间段与筛选时间段有交集
+          // 订单开始 <= 筛选结束 且 订单到期 >= 筛选开始
+          dateMatch = orderStart <= endTime && orderExpire >= startTime
+        } else if (startTime) {
+          // 只有起始时间：订单到期时间 >= 起始时间
+          dateMatch = orderExpire >= startTime
+        } else if (endTime) {
+          // 只有截止时间：订单开始时间 <= 截止时间
+          dateMatch = orderStart <= endTime
+        }
+      }
+
+      // 两个条件独立，都满足才匹配
+      return keywordMatch && dateMatch
     })
 
     this.setData({ orders: filtered })

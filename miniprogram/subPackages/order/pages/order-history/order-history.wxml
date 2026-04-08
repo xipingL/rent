@@ -9,17 +9,22 @@
     <view class="search-row">
       <text class="search-icon">🔍</text>
       <input type="text" class="search-input" placeholder="搜索租车人、车牌、品牌..." bindinput="onSearchInput"></input>
+      <view class="search-btn" bindtap="onSearch">搜索</view>
     </view>
-    <view class="search-row time-range">
-      <view class="date-picker-wrapper">
-        <view class="time-input">{{startTime || '开始日期'}}</view>
-        <picker mode="date" value="{{startTime}}" bindchange="onStartTimeChange"></picker>
-      </view>
-      <text class="time-label">至</text>
-      <view class="date-picker-wrapper">
-        <view class="time-input">{{endTime || '结束日期'}}</view>
-        <picker mode="date" value="{{endTime}}" bindchange="onEndTimeChange"></picker>
-      </view>
+    <view class="date-row">
+      <picker mode="date" value="{{startTime}}" bindchange="onStartTimeChange">
+        <view class="date-item">
+          <text class="date-icon">📅</text>
+          <text class="date-text">{{startTime || '开始日期'}}</text>
+        </view>
+      </picker>
+      <text class="date-separator">至</text>
+      <picker mode="date" value="{{endTime}}" bindchange="onEndTimeChange">
+        <view class="date-item">
+          <text class="date-icon">📅</text>
+          <text class="date-text">{{endTime || '结束日期'}}</text>
+        </view>
+      </picker>
     </view>
   </view>
 
