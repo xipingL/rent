@@ -1,0 +1,90 @@
+<!--pages/renew/renew.wxml-->
+<view class="container">
+  <view class="header">
+    <view class="header-left">
+      <view class="back-btn" bindtap="goBack">←</view>
+      <view class="header-title">续租车辆</view>
+    </view>
+  </view>
+
+  <view class="loading-view" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+  <scroll-view class="content" scroll-y wx:else>
+    <view class="vehicle-card" wx:if="{{vehicle}}">
+      <view class="vehicle-thumb">🛵</view>
+      <view class="vehicle-info">
+        <view class="vehicle-name">{{vehicle.name}}</view>
+        <view class="vehicle-detail">{{vehicle.plateNo}} · {{vehicle.color}} · {{vehicle.battery}}</view>
+        <text class="vehicle-status">租聘中</text>
+      </view>
+    </view>
+
+    <view class="remaining-time" wx:if="{{rentals.length > 0}}">
+      <text class="remaining-label">{{remainingType === 'expired' ? '已超时' : '剩余可使用'}}</text>
+      <text class="remaining-value {{remainingType === 'expired' ? 'expired' : ''}}">{{remainingTime}}</text>
+    </view>
+
+    <view class="form-section" wx:if="{{rentals.length > 0}}">
+      <view class="section-title">当前租聘信息</view>
+      <view class="rental-card" wx:for="{{rentals}}" wx:key="_id">
+        <view class="rental-header">
+          <text class="rental-type">{{item.type === 0 ? '首次租聘' : '续租'}}</text>
+          <text class="rental-duration">{{item.duration}}天</text>
+        </view>
+        <view class="rental-dates">
+          <text>起租: {{item.startTime}}</text>
+          <text>到期: {{item.expireTime}}</text>
+        </view>
+        <text class="rental-user">租车人：{{item.renterName}} · {{item.renterPhone}}</text>
+      </view>
+    </view>
+
+    <view class="form-section" wx:if="{{rentals.length > 0}}">
+      <view class="section-title">续租信息</view>
+      <view class="form-group">
+        <text class="form-label">续租时长</text>
+        <view class="duration-options">
+          <view class="duration-btn {{duration === 1 ? 'active' : ''}}" bindtap="selectDuration" data-days="1">1天</view>
+          <view class="duration-btn {{duration === 3 ? 'active' : ''}}" bindtap="selectDuration" data-days="3">3天</view>
+          <view class="duration-btn {{duration === 7 ? 'active' : ''}}" bindtap="selectDuration" data-days="7">7天</view>
+          <view class="duration-btn {{duration === 15 ? 'active' : ''}}" bindtap="selectDuration" data-days="15">15天</view>
+          <view class="duration-btn {{duration === 30 ? 'active' : ''}}" bindtap="selectDuration" data-days="30">30天</view>
+          <view class="duration-btn {{duration === -1 ? 'active' : ''}}" bindtap="selectDuration" data-days="-1">自定义</view>
+        </view>
+      </view>
+
+      <view class="form-group" wx:if="{{duration === -1}}">
+        <view class="picker-input" bindtap="showExpireDatePicker">{{customDurationText || '请选择续租时长'}}</view>
+        <van-popup show="{{showExpirePicker}}" round position="bottom" bind:close="closeExpireDatePicker">
+          <van-picker
+            id="durationPicker"
+            show-toolbar
+            title="续租时长"
+            columns="{{durationColumns}}"
+            bind:change="onDurationChange"
+            bind:confirm="onDurationConfirm"
+            bind:cancel="closeExpireDatePicker"
+          />
+        </van-popup>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">续租后到期时间</text>
+        <view class="expire-time">
+          <text>预计归还时间</text>
+          <text class="expire-value">{{expireTime}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-section" wx:if="{{rentals.length === 0}}">
+      <view class="section-title">提示</view>
+      <view class="empty-tip">该车辆暂无生效中的租聘记录</view>
+    </view>
+
+    <view class="submit-section" wx:if="{{rentals.length > 0}}">
+      <button class="submit-btn" bindtap="confirmRenew">确认续租</button>
+    </view>
+  </scroll-view>
+</view>

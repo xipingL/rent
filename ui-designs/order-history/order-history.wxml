@@ -1,0 +1,57 @@
+<!--pages/order-history/order-history.wxml-->
+<view class="container">
+  <view class="status-bar">
+    <text>9:41</text>
+    <text class="status-right">📶 🔋</text>
+  </view>
+
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">←</view>
+    <view class="header-title">历史订单</view>
+  </view>
+
+  <view class="search-bar">
+    <view class="search-row">
+      <text class="search-icon">🔍</text>
+      <input type="text" class="search-input" placeholder="搜索租车人、车牌、品牌..." bindinput="onSearchInput"></input>
+    </view>
+    <view class="search-row time-range">
+      <input type="date" class="time-input" placeholder="起租时间" bindchange="onStartTimeChange"></input>
+      <text class="time-label">至</text>
+      <input type="date" class="time-input" placeholder="归还时间" bindchange="onEndTimeChange"></input>
+    </view>
+  </view>
+
+  <scroll-view class="content" scroll-y>
+    <block wx:for="{{orders}}" wx:key="id">
+      <view class="order-card">
+        <view class="order-header">
+          <view class="order-vehicle">
+            <view class="vehicle-thumb">{{item.thumb}}</view>
+            <view>
+              <view class="vehicle-name">{{item.name}}</view>
+              <view class="vehicle-plate">{{item.plateNo}}</view>
+            </view>
+          </view>
+          <text class="order-status status-completed">已完成</text>
+        </view>
+        <view class="order-info">
+          <view class="time-row">
+            <view class="info-item start">
+              <text class="info-label">起租时间</text>
+              <text class="info-value">{{item.startTime}}</text>
+            </view>
+            <view class="info-item end">
+              <text class="info-label">归还时间</text>
+              <text class="info-value">{{item.endTime}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="order-renter">
+          <text class="renter-name">👤 {{item.renter}}</text>
+          <text class="renter-phone">{{item.phone}}</text>
+        </view>
+      </view>
+    </block>
+  </scroll-view>
+</view>

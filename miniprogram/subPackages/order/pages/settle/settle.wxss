@@ -1,0 +1,33 @@
+/* pages/settle/settle.wxss */
+.container {min-height: 100vh;background: #f8f9fa;}
+.header {width: 100%;background: linear-gradient(135deg, #6c5ce7 0%, #a55eea 100%);padding: 32rpx 48rpx;color: #fff;display: flex;align-items: center;box-sizing: border-box;}
+.header-left {display: flex;align-items: center;gap: 24rpx;}
+.back-btn {width: 72rpx;height: 72rpx;background: rgba(255,255,255,0.2);border-radius: 50%;display: flex;align-items: center;justify-content: center;font-size: 36rpx;}
+.header-title {font-size: 36rpx;font-weight: 700;}
+.content {padding: 0;flex: 1;height: calc(100vh - 160rpx);}
+.loading-view {flex: 1;display: flex;align-items: center;justify-content: center;color: #636e72;font-size: 28rpx;}
+.vehicle-card {background: #fff;padding: 32rpx 40rpx;display: flex;align-items: center;gap: 24rpx;}
+.vehicle-thumb {width: 120rpx;height: 120rpx;background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);border-radius: 24rpx;display: flex;align-items: center;justify-content: center;font-size: 60rpx;}
+.vehicle-info {flex: 1;}
+.vehicle-name {font-size: 32rpx;font-weight: 600;color: #2d3436;}
+.vehicle-detail {font-size: 24rpx;color: #636e72;margin-top: 8rpx;}
+.form-section {background: #fff;padding: 40rpx;margin-top: 24rpx;}
+.section-title {font-size: 28rpx;font-weight: 600;color: #2d3436;margin-bottom: 32rpx;padding-bottom: 16rpx;border-bottom: 2rpx solid #f1f2f6;}
+.renter-info {display: flex;align-items: center;gap: 24rpx;}
+.renter-avatar {width: 100rpx;height: 100rpx;background: linear-gradient(135deg, #a55eea 0%, #6c5ce7 100%);border-radius: 50%;display: flex;align-items: center;justify-content: center;font-size: 48rpx;color: #fff;}
+.renter-detail {flex: 1;}
+.renter-name {font-size: 32rpx;font-weight: 600;color: #2d3436;}
+.renter-phone {font-size: 26rpx;color: #636e72;margin-top: 4rpx;}
+.rental-card {background: #f8f9fa;border-radius: 24rpx;padding: 28rpx;margin-bottom: 20rpx;}
+.rental-header {display: flex;justify-content: space-between;align-items: center;margin-bottom: 20rpx;}
+.rental-type {font-size: 26rpx;font-weight: 600;color: #2d3436;}
+.rental-duration {font-size: 24rpx;color: #636e72;background: #dfe6e9;padding: 4rpx 16rpx;border-radius: 8rpx;}
+.rental-dates {display: flex;justify-content: space-between;font-size: 24rpx;color: #636e72;}
+.photos-grid {display: flex;gap: 16rpx;overflow-x: auto;padding-bottom: 16rpx;}
+.photo-item {width: 200rpx;height: 200rpx;flex-shrink: 0;background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);border-radius: 20rpx;display: flex;align-items: center;justify-content: center;font-size: 48rpx;overflow: hidden;}
+.photo-item image {width: 100%;height: 100%;object-fit: cover;}
+.photo-item.add {background: #f1f2f6;border: 4rpx dashed #dfe6e9;font-size: 40rpx;color: #b2bec3;}
+.remark-input {width: 100%;padding: 24rpx;border: 2rpx solid #dfe6e9;border-radius: 20rpx;font-size: 28rpx;background: #f8f9fa;height: 160rpx;box-sizing: border-box;}
+.submit-section {padding: 40rpx;background: #fff;margin-top: 24rpx;}
+.submit-btn {width: 100%;padding: 32rpx;background: linear-gradient(135deg, #6c5ce7 0%, #a55eea 100%);color: #fff;border: none;border-radius: 24rpx;font-size: 32rpx;font-weight: 600;}
+.empty-tip {text-align: center;color: #b2bec3;font-size: 28rpx;padding: 40rpx;}

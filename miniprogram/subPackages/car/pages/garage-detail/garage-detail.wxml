@@ -1,0 +1,96 @@
+<!--pages/garage-detail/garage-detail.wxml-->
+<view class="container">
+  <view class="header">
+    <view class="header-left">
+      <view class="back-btn" bindtap="goBack">←</view>
+      <view class="header-title">车辆详情</view>
+    </view>
+    <view class="header-actions">
+      <view class="action-icon" bindtap="goToEdit">✏️</view>
+      <view class="action-icon" bindtap="deleteVehicle">🗑️</view>
+    </view>
+  </view>
+
+  <view class="loading-view" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <scroll-view class="content" scroll-y wx:else>
+    <!-- 封面 -->
+    <view class="cover-section">
+      <image class="cover-img" wx:if="{{vehicle.image}}" src="{{vehicle.image}}" mode="aspectFill"></image>
+      <text class="cover-emoji" wx:else>🛵</text>
+      <view class="vehicle-status status-{{vehicle.status}}">{{getStatusText(vehicle.status)}}</view>
+    </view>
+
+    <!-- 车辆信息 -->
+    <view class="info-section">
+      <view class="info-header">
+        <view>
+          <view class="vehicle-name">{{vehicle.name}}</view>
+          <text class="vehicle-brand">{{vehicle.brand}}</text>
+        </view>
+      </view>
+      <view class="info-grid">
+        <view class="info-item">
+          <text class="info-label">车架号</text>
+          <text class="info-value">{{vehicle.frameNo || '无'}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">牌照号</text>
+          <text class="info-value license">{{vehicle.plateNo || '无'}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">颜色</text>
+          <text class="info-value">{{vehicle.color || '无'}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">电池型号</text>
+          <text class="info-value">{{vehicle.battery || '无'}}</text>
+        </view>
+      </view>
+      <view class="info-note" wx:if="{{vehicle.note}}">
+        <text class="note-label">备注</text>
+        <text>{{vehicle.note}}</text>
+      </view>
+    </view>
+
+    <!-- 车辆照片 -->
+    <view class="photos-section" wx:if="{{vehicle.photosUrls && vehicle.photosUrls.length > 0}}">
+      <view class="section-title">车辆照片</view>
+      <view class="photos-grid">
+        <image class="photo-item" wx:for="{{vehicle.photosUrls}}" wx:key="*this" src="{{item}}" mode="aspectFill"></image>
+      </view>
+    </view>
+
+    <!-- 租聘记录 -->
+    <view class="rental-section" wx:if="{{rentalHistory.length > 0}}">
+      <view class="section-title">租聘记录</view>
+      <view class="rental-card" wx:for="{{rentalHistory}}" wx:key="_id">
+        <view class="rental-header">
+          <view class="rental-user">👤 {{item.renterName}}</view>
+          <view class="rental-phone">{{item.renterPhone}}</view>
+        </view>
+        <view class="rental-dates">
+          <view>
+            <text class="date-label">起租时间</text>
+            <text class="date-value">{{item.startTime}}</text>
+          </view>
+          <view>
+            <text class="date-label">到期时间</text>
+            <text class="date-value">{{item.expireTime}}</text>
+          </view>
+        </view>
+        <view class="rental-duration">
+          <text class="duration-label">租期</text>
+          <text class="duration-value">{{item.duration}}天</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 无租聘记录 -->
+    <view class="empty-tip" wx:if="{{rentalHistory.length === 0 && !loading}}">
+      <text>暂无租聘记录</text>
+    </view>
+  </scroll-view>
+</view>

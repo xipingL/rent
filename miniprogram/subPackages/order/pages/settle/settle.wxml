@@ -1,0 +1,70 @@
+<!--pages/settle/settle.wxml-->
+<view class="container">
+  <view class="header"><view class="header-left"><view class="back-btn" bindtap="goBack">←</view><view class="header-title">结算</view></view></view>
+  <view class="loading-view" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+  <scroll-view class="content" scroll-y wx:else>
+    <view class="vehicle-card" wx:if="{{vehicle}}">
+      <view class="vehicle-thumb">🛵</view>
+      <view class="vehicle-info">
+        <view class="vehicle-name">{{vehicle.name}}</view>
+        <view class="vehicle-detail">{{vehicle.plateNo}} · {{vehicle.color}} · {{vehicle.battery}}</view>
+      </view>
+    </view>
+
+    <view class="form-section" wx:if="{{rentals.length > 0}}">
+      <view class="section-title">租车人信息</view>
+      <view class="renter-info">
+        <view class="renter-avatar">👤</view>
+        <view class="renter-detail">
+          <view class="renter-name">{{rentals[0].renterName}}</view>
+          <view class="renter-phone">{{rentals[0].renterPhone}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-section" wx:if="{{rentals.length > 0}}">
+      <view class="section-title">租聘记录</view>
+      <view class="rental-card" wx:for="{{rentals}}" wx:key="_id">
+        <view class="rental-header">
+          <text class="rental-type">{{item.type === 0 ? '首次租聘' : '续租'}}</text>
+          <text class="rental-duration">{{item.duration}}天</text>
+        </view>
+        <view class="rental-dates">
+          <text>起租: {{item.startTime}}</text>
+          <text>到期: {{item.expireTime}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-section" wx:if="{{rentals.length > 0 && rentals[0].vehiclePhotosUrls}}">
+      <view class="section-title">租聘时车辆照片</view>
+      <view class="photos-grid">
+        <image class="photo-item" wx:for="{{rentals[0].vehiclePhotosUrls}}" wx:key="*this" src="{{item}}" mode="aspectFill"></image>
+      </view>
+    </view>
+
+    <view class="form-section">
+      <view class="section-title">结算照片</view>
+      <view class="photos-grid">
+        <image class="photo-item" wx:for="{{settlePhotos}}" wx:key="*this" src="{{item}}" mode="aspectFill"></image>
+        <view class="photo-item add" bindtap="chooseSettlePhoto" wx:if="{{settlePhotos.length < 6}}">+</view>
+      </view>
+    </view>
+
+    <view class="form-section">
+      <view class="section-title">结算备注</view>
+      <textarea class="remark-input" placeholder="请输入结算备注..." bindinput="onRemarkInput" value="{{remark}}"></textarea>
+    </view>
+
+    <view class="submit-section" wx:if="{{rentals.length > 0}}">
+      <button class="submit-btn" bindtap="confirmSettle">确认结算</button>
+    </view>
+
+    <view class="form-section" wx:if="{{rentals.length === 0}}">
+      <view class="section-title">提示</view>
+      <view class="empty-tip">该车辆暂无生效中的租聘记录</view>
+    </view>
+  </scroll-view>
+</view>

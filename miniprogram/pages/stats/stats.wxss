@@ -1,0 +1,163 @@
+/* pages/stats/stats.wxss */
+.container {
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.status-bar {
+  height: 44rpx;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.header {
+  width: 100%;
+  background: linear-gradient(135deg, #e84393 0%, #fd79a8 100%);
+  padding: 40rpx 48rpx;
+  color: #ffffff;
+  box-sizing: border-box;
+}
+
+.header-title {
+  font-size: 44rpx;
+  font-weight: 700;
+}
+
+.header-subtitle {
+  font-size: 26rpx;
+  opacity: 0.9;
+  margin-top: 8rpx;
+}
+
+.tabs {
+  width: 100%;
+  background: #ffffff;
+  display: flex;
+  padding: 24rpx 32rpx;
+  gap: 16rpx;
+  box-sizing: border-box;
+}
+
+.tab {
+  flex: 1;
+  padding: 20rpx 0;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #636e72;
+  background: #f1f2f6;
+  border-radius: 20rpx;
+  box-sizing: border-box;
+}
+
+.tab.active {
+  background: #e84393;
+  color: #ffffff;
+}
+
+.content {
+  padding: 32rpx;
+  height: calc(100vh - 280rpx);
+}
+
+.chart-section {
+  background: #ffffff;
+  border-radius: 32rpx;
+  padding: 32rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 8rpx 40rpx rgba(0, 0, 0, 0.06);
+}
+
+.chart-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #2d3436;
+  margin-bottom: 32rpx;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24rpx;
+}
+
+.stat-card {
+  background: #f8f9fa;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 56rpx;
+  font-weight: 700;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #636e72;
+  margin-top: 8rpx;
+}
+
+.line-chart {
+  height: 200rpx;
+  width: 100%;
+}
+
+.chart-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 12rpx;
+  padding: 16rpx 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.tooltip-label {
+  font-size: 22rpx;
+  color: #ffffff;
+  opacity: 0.8;
+}
+
+.tooltip-value {
+  font-size: 28rpx;
+  color: #e84393;
+  font-weight: 600;
+  margin-top: 4rpx;
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #f1f2f6;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.item-name {
+  font-size: 28rpx;
+  color: #2d3436;
+}
+
+.item-count {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #e84393;
+}

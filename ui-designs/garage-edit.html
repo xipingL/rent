@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑车辆 - 电瓶车租赁管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .phone {
+            width: 375px;
+            height: 812px;
+            background: #f8f9fa;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+            padding: 16px 24px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .content {
+            padding: 0;
+            height: calc(100% - 140px);
+            overflow-y: auto;
+        }
+
+        /* 封面区域 */
+        .cover-section {
+            position: relative;
+            height: 200px;
+            background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+        }
+
+        .edit-cover-btn {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            background: rgba(0, 0, 0, 0.5);
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* 表单区域 */
+        .form-section {
+            background: #ffffff;
+            padding: 20px;
+        }
+
+        .form-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3436;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f1f2f6;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            color: #636e72;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #dfe6e9;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #2d3436;
+            background: #f8f9fa;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #0984e3;
+            background: #ffffff;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* 详细照片 */
+        .photos-section {
+            background: #ffffff;
+            padding: 20px;
+            margin-top: 12px;
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .photo-item {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .photo-item.add-photo {
+            background: #f1f2f6;
+            border: 2px dashed #dfe6e9;
+            font-size: 24px;
+            color: #b2bec3;
+        }
+
+        .photo-delete {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            background: rgba(231, 76, 60, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* 提交按钮 */
+        .submit-section {
+            padding: 20px;
+            background: #ffffff;
+            margin-top: 12px;
+            padding-bottom: 40px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #b2bec3;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: #0984e3;
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>📶 🔋</span>
+        </div>
+
+        <!-- 头部 -->
+        <div class="header">
+            <div class="header-left">
+                <div class="back-btn">←</div>
+                <div class="header-title">编辑车辆</div>
+            </div>
+        </div>
+
+        <!-- 内容区 -->
+        <div class="content">
+            <!-- 封面 -->
+            <div class="cover-section">
+                🛵
+                <div class="edit-cover-btn">📷 修改封面</div>
+            </div>
+
+            <!-- 基本信息 -->
+            <div class="form-section">
+                <div class="form-title">基本信息</div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">车款名</label>
+                        <input type="text" class="form-input" value="雅迪DT3">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">品牌</label>
+                        <input type="text" class="form-input" value="雅迪">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">车架号</label>
+                        <input type="text" class="form-input" value="L5Y2023A12345">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">牌照号</label>
+                        <input type="text" class="form-input" value="A88888">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">颜色</label>
+                        <input type="text" class="form-input" value="石墨黑">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">电池型号</label>
+                        <input type="text" class="form-input" value="72V 23Ah">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">备注</label>
+                    <input type="text" class="form-input" value="车身有轻微划痕，后视镜需更换">
+                </div>
+            </div>
+
+            <!-- 详细照片 -->
+            <div class="photos-section">
+                <div class="form-title">车辆照片</div>
+                <div class="photos-grid">
+                    <div class="photo-item">
+                        🛵
+                        <div class="photo-delete">×</div>
+                    </div>
+                    <div class="photo-item">
+                        🔧
+                        <div class="photo-delete">×</div>
+                    </div>
+                    <div class="photo-item">
+                        🔋
+                        <div class="photo-delete">×</div>
+                    </div>
+                    <div class="photo-item">
+                        📷
+                        <div class="photo-delete">×</div>
+                    </div>
+                    <div class="photo-item">
+                        🛑
+                        <div class="photo-delete">×</div>
+                    </div>
+                    <div class="photo-item add-photo">
+                        +
+                    </div>
+                </div>
+            </div>
+
+            <!-- 提交按钮 -->
+            <div class="submit-section">
+                <button class="submit-btn">保存修改</button>
+            </div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <span class="nav-icon">🏠</span>
+                <span>首页</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">📋</span>
+                <span>订单</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span>统计</span>
+            </div>
+            <div class="nav-item active">
+                <span class="nav-icon">👤</span>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

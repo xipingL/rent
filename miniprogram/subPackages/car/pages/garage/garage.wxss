@@ -1,0 +1,252 @@
+/* pages/garage/garage.wxss */
+.container {
+  width: 100%;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.header {
+  width: 100%;
+  background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+  padding: 32rpx 24rpx;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.back-btn {
+  width: 72rpx;
+  height: 72rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+}
+
+.header-title {
+  font-size: 40rpx;
+  font-weight: 700;
+}
+
+.add-btn {
+  width: 72rpx;
+  height: 72rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+}
+
+.tabs {
+  width: 100%;
+  background: #ffffff;
+  display: flex;
+  padding: 24rpx 24rpx;
+  gap: 16rpx;
+  box-sizing: border-box;
+}
+
+.tab {
+  flex: 1;
+  aspect-ratio: 2 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #636e72;
+  background: #f1f2f6;
+  border-radius: 20rpx;
+}
+
+.tab.active {
+  background: #0984e3;
+  color: #ffffff;
+}
+
+.content {
+  padding: 16rpx;
+  height: calc(100vh - 280rpx);
+}
+
+.vehicle-card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  margin: 0 24rpx 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+}
+
+.vehicle-image {
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.vehicle-img {
+  width: 100%;
+  height: 100%;
+}
+
+.vehicle-status {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.vehicle-status.status-0 {
+  background: #37B794;
+}
+
+.vehicle-status.status-1 {
+  background: #F7CD73;
+}
+
+.vehicle-status.status-2 {
+  background: #D97459;
+}
+
+.vehicle-info {
+  padding: 16rpx;
+}
+
+.vehicle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.vehicle-name {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #2d3436;
+  margin-bottom: 8rpx;
+}
+
+.vehicle-brand {
+  font-size: 24rpx;
+  color: #636e72;
+  background: #f1f2f6;
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.info-label {
+  font-size: 22rpx;
+  color: #b2bec3;
+}
+
+.info-value {
+  font-size: 26rpx;
+  color: #2d3436;
+  font-weight: 500;
+  margin-top: 4rpx;
+}
+
+.info-value.license {
+  background: #dfe6e9;
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+  display: inline-block;
+}
+
+.vehicle-note {
+  margin-top: 12rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx solid #f1f2f6;
+  font-size: 24rpx;
+  color: #636e72;
+}
+
+.note-label {
+  color: #b2bec3;
+  margin-bottom: 8rpx;
+}
+
+.vehicle-actions {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f1f2f6;
+}
+
+.action-btn {
+  flex: 0 0 auto;
+  width: 22%;
+  aspect-ratio: 7 / 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  text-align: center;
+  border: none;
+}
+
+.btn-rent {
+  background: linear-gradient(135deg, #00d4aa 0%, #00b894 100%);
+  color: #ffffff;
+}
+
+.btn-renew {
+  background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);
+  color: #ffffff;
+}
+
+.btn-settle {
+  background: linear-gradient(135deg, #6c5ce7 0%, #a55eea 100%);
+  color: #ffffff;
+}
+
+.btn-edit {
+  background: #f1f2f6;
+  color: #636e72;
+}
+
+.btn-delete {
+  background: #ffeaea;
+  color: #e74c3c;
+}
+
+.action-btn.btn-wide {
+  width: 30%;
+  aspect-ratio: 7 / 3;
+}

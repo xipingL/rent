@@ -1,0 +1,12 @@
+<button
+  class="van-button {{ type ? 'van-button--' + type : '' }} {{ size ? 'van-button--' + size : '' }} {{ round ? 'van-button--round' : '' }} {{ plain ? 'van-button--plain' : '' }} {{ block ? 'van-button--block' : '' }} {{ disabled ? 'van-button--disabled' : '' }} {{ loading ? 'van-button--loading' : '' }}"
+  hover-class="van-button--hover"
+  bindtap="handleTap"
+  open-type="{{ openType }}"
+  disabled="{{ disabled || loading }}"
+>
+  <view class="van-button__content">
+    <van-icon wx:if="{{ loading }}" size="{{ loadingSize }}" color="#fff" class="van-button__loading" />
+    <slot></slot>
+  </view>
+</button>

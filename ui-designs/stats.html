@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>统计 - 电瓶车租赁管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .phone {
+            width: 375px;
+            height: 812px;
+            background: #f8f9fa;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #e84393 0%, #fd79a8 100%);
+            padding: 20px 24px;
+            color: #ffffff;
+        }
+
+        .header-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .tabs {
+            background: #ffffff;
+            display: flex;
+            padding: 12px 16px;
+            gap: 8px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+            color: #636e72;
+            background: #f1f2f6;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: #e84393;
+            color: #ffffff;
+        }
+
+        .content {
+            padding: 16px;
+            height: calc(100% - 200px);
+            overflow-y: auto;
+        }
+
+        /* 数据卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .stat-card.highlight {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #e84393 0%, #fd79a8 100%);
+            color: #ffffff;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .stat-card.highlight .stat-value {
+            font-size: 36px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #636e72;
+            margin-top: 4px;
+        }
+
+        .stat-card.highlight .stat-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* 图表区域 */
+        .chart-section {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .chart-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3436;
+            margin-bottom: 16px;
+        }
+
+        .bar-chart {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 100px;
+            padding: 0 8px;
+        }
+
+        .bar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .bar {
+            width: 24px;
+            background: linear-gradient(180deg, #e84393 0%, #fd79a8 100%);
+            border-radius: 4px 4px 0 0;
+        }
+
+        .bar-label {
+            font-size: 10px;
+            color: #b2bec3;
+        }
+
+        .bar-value {
+            font-size: 10px;
+            color: #636e72;
+            font-weight: 600;
+        }
+
+        /* 折线图 */
+        .line-chart {
+            position: relative;
+            height: 100px;
+            padding: 0 8px;
+        }
+
+        .line-chart svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .line-point {
+            fill: #e84393;
+        }
+
+        .line-path {
+            fill: none;
+            stroke: #e84393;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .line-area {
+            fill: url(#lineGradient);
+        }
+
+        /* 列表区域 */
+        .list-section {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .list-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3436;
+            margin-bottom: 12px;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f2f6;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-icon {
+            width: 32px;
+            height: 32px;
+            background: #f1f2f6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .item-name {
+            font-size: 13px;
+            color: #2d3436;
+        }
+
+        .item-count {
+            font-size: 13px;
+            font-weight: 600;
+            color: #e84393;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #b2bec3;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: #e84393;
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        /* 隐藏非当前标签的数据 */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        function switchTab(tab) {
+            // 更新标签状态
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // 更新内容显示
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+        }
+    </script>
+    <div class="phone">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>📶 🔋</span>
+        </div>
+
+        <!-- 头部 -->
+        <div class="header">
+            <div class="header-title">统计</div>
+            <div class="header-subtitle">数据概览与分析</div>
+        </div>
+
+        <!-- 标签页 -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('today')">今日</div>
+            <div class="tab" onclick="switchTab('week')">本周</div>
+            <div class="tab" onclick="switchTab('month')">本月</div>
+        </div>
+
+        <!-- 内容区 -->
+        <div class="content">
+            <!-- 今日数据 -->
+            <div class="tab-content active" id="today">
+                <div class="chart-section">
+                    <div class="chart-title">车辆状态</div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" style="color: #00b894;">128</div>
+                            <div class="stat-label">租聘中</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" style="color: #74b9ff;">42</div>
+                            <div class="stat-label">空闲</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" style="color: #e17055;">8</div>
+                            <div class="stat-label">待结算</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <div class="chart-title">今日车辆变化</div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" style="color: #00b894;">+2</div>
+                            <div class="stat-label">新增车辆</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" style="color: #e74c3c;">0</div>
+                            <div class="stat-label">报废/删除</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 本周数据 -->
+            <div class="tab-content" id="week">
+                <div class="chart-section">
+                    <div class="chart-title">本周订单</div>
+                    <div class="stat-card" style="text-align: left;">
+                        <div class="stat-value" style="font-size: 36px;">248</div>
+                        <div class="stat-label">本周累计订单</div>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <div class="chart-title">近7天订单趋势</div>
+                    <div class="line-chart">
+                        <svg viewBox="0 0 300 80">
+                            <defs>
+                                <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#e84393;stop-opacity:0.3" />
+                                    <stop offset="100%" style="stop-color:#e84393;stop-opacity:0" />
+                                </linearGradient>
+                            </defs>
+                            <!-- 区域填充 -->
+                            <path class="line-area" d="M10,60 L50,45 L90,30 L130,40 L170,20 L210,10 L250,25 L290,30 L290,70 L10,70 Z" />
+                            <!-- 折线 -->
+                            <path class="line-path" d="M10,60 L50,45 L90,30 L130,40 L170,20 L210,10 L250,25 L290,30" />
+                            <!-- 数据点 -->
+                            <circle class="line-point" cx="10" cy="60" r="3" />
+                            <circle class="line-point" cx="50" cy="45" r="3" />
+                            <circle class="line-point" cx="90" cy="30" r="3" />
+                            <circle class="line-point" cx="130" cy="40" r="3" />
+                            <circle class="line-point" cx="170" cy="20" r="3" />
+                            <circle class="line-point" cx="210" cy="10" r="3" />
+                            <circle class="line-point" cx="250" cy="25" r="3" />
+                            <circle class="line-point" cx="290" cy="30" r="3" />
+                            <!-- X轴标签 -->
+                            <text x="10" y="78" font-size="9" fill="#b2bec3" text-anchor="middle">周一</text>
+                            <text x="50" y="78" font-size="9" fill="#b2bec3" text-anchor="middle">周二</text>
+                            <text x="90" y="78" font-size="9" fill="#b2bec3" text-anchor="middle">周三</text>
+                            <text x="130" y="78" font-size="9" fill="#b2bec3" text-anchor="middle">周四</text>
+                            <text x="170" y="78" font-size="9" fill="#b2bec3" text-anchor="middle">周五</text>
+                            <text x="210" y="78" font-size="9" fill="#b2bec3" text-anchor="middle">周六</text>
+                            <text x="250" y="78" font-size="9" fill="#b2bec3" text-anchor="middle">周日</text>
+                            <text x="290" y="78" font-size="9" fill="#b2bec3" text-anchor="middle"></text>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <div class="chart-title">本周车辆变化</div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" style="color: #00b894;">+5</div>
+                            <div class="stat-label">新增车辆</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" style="color: #e74c3c;">-2</div>
+                            <div class="stat-label">报废/删除</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 本月数据 -->
+            <div class="tab-content" id="month">
+                <div class="chart-section">
+                    <div class="chart-title">本月订单</div>
+                    <div class="stat-card" style="text-align: left;">
+                        <div class="stat-value" style="font-size: 36px;">1,286</div>
+                        <div class="stat-label">本月累计订单</div>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <div class="chart-title">近30天订单趋势</div>
+                    <div class="line-chart">
+                        <svg viewBox="0 0 300 80">
+                            <defs>
+                                <linearGradient id="lineGradient2" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#e84393;stop-opacity:0.3" />
+                                    <stop offset="100%" style="stop-color:#e84393;stop-opacity:0" />
+                                </linearGradient>
+                            </defs>
+                            <path class="line-area" d="M10,50 L60,40 L110,55 L160,30 L210,25 L260,35 L290,20 L290,70 L10,70 Z" />
+                            <path class="line-path" d="M10,50 L60,40 L110,55 L160,30 L210,25 L260,35 L290,20" />
+                            <circle class="line-point" cx="10" cy="50" r="3" />
+                            <circle class="line-point" cx="60" cy="40" r="3" />
+                            <circle class="line-point" cx="110" cy="55" r="3" />
+                            <circle class="line-point" cx="160" cy="30" r="3" />
+                            <circle class="line-point" cx="210" cy="25" r="3" />
+                            <circle class="line-point" cx="260" cy="35" r="3" />
+                            <circle class="line-point" cx="290" cy="20" r="3" />
+                            <text x="10" y="78" font-size="9" fill="#b2bec3" text-anchor="middle">1周</text>
+                            <text x="60" y="78" font-size="9" fill="#b2bec3" text-anchor="middle">2周</text>
+                            <text x="110" y="78" font-size="9" fill="#b2bec3" text-anchor="middle">3周</text>
+                            <text x="160" y="78" font-size="9" fill="#b2bec3" text-anchor="middle">4周</text>
+                            <text x="210" y="78" font-size="9" fill="#b2bec3" text-anchor="middle"></text>
+                            <text x="260" y="78" font-size="9" fill="#b2bec3" text-anchor="middle"></text>
+                            <text x="290" y="78" font-size="9" fill="#b2bec3" text-anchor="middle"></text>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <div class="chart-title">本月车辆变化</div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" style="color: #00b894;">+15</div>
+                            <div class="stat-label">新增车辆</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" style="color: #e74c3c;">-3</div>
+                            <div class="stat-label">报废/删除</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <div class="chart-title">热门车型 TOP5</div>
+                    <div class="list-item">
+                        <div class="item-left">
+                            <span class="item-name">雅迪DT3</span>
+                        </div>
+                        <span class="item-count">286次</span>
+                    </div>
+                    <div class="list-item">
+                        <div class="item-left">
+                            <span class="item-name">爱玛晴天</span>
+                        </div>
+                        <span class="item-count">234次</span>
+                    </div>
+                    <div class="list-item">
+                        <div class="item-left">
+                            <span class="item-name">台铃萌彩</span>
+                        </div>
+                        <span class="item-count">198次</span>
+                    </div>
+                    <div class="list-item">
+                        <div class="item-left">
+                            <span class="item-name">新日小宇宙</span>
+                        </div>
+                        <span class="item-count">165次</span>
+                    </div>
+                    <div class="list-item">
+                        <div class="item-left">
+                            <span class="item-name">小牛MQi2</span>
+                        </div>
+                        <span class="item-count">142次</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <span class="nav-icon">🏠</span>
+                <span>首页</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">📋</span>
+                <span>订单</span>
+            </div>
+            <div class="nav-item active">
+                <span class="nav-icon">📊</span>
+                <span>统计</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">👤</span>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

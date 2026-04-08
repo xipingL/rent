@@ -1,0 +1,65 @@
+<!--pages/order-history/order-history.wxml-->
+<view class="container">
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">←</view>
+    <view class="header-title">历史订单</view>
+  </view>
+
+  <view class="search-bar">
+    <view class="search-row">
+      <text class="search-icon">🔍</text>
+      <input type="text" class="search-input" placeholder="搜索租车人、车牌、品牌..." bindinput="onSearchInput"></input>
+    </view>
+    <view class="search-row time-range">
+      <view class="date-picker-wrapper">
+        <view class="time-input">{{startTime || '开始日期'}}</view>
+        <picker mode="date" value="{{startTime}}" bindchange="onStartTimeChange"></picker>
+      </view>
+      <text class="time-label">至</text>
+      <view class="date-picker-wrapper">
+        <view class="time-input">{{endTime || '结束日期'}}</view>
+        <picker mode="date" value="{{endTime}}" bindchange="onEndTimeChange"></picker>
+      </view>
+    </view>
+  </view>
+
+  <scroll-view class="content" scroll-y>
+    <block wx:for="{{orders}}" wx:key="_id">
+      <view class="order-card">
+        <view class="order-header">
+          <view class="order-vehicle">
+            <image class="vehicle-thumb" src="{{item.carImage}}" mode="aspectFill" wx:if="{{item.carImage}}"></image>
+            <view class="vehicle-thumb vehicle-emoji" wx:else>🛵</view>
+            <view>
+              <view class="vehicle-name">{{item.name || '未知车辆'}}</view>
+              <view class="vehicle-plate">{{item.plateNo || '-'}}</view>
+            </view>
+          </view>
+          <view class="order-status {{item.status === 0 ? 'status-renting' : (item.status === 1 ? 'status-pending' : 'status-completed')}}">
+            {{item.status === 0 ? '进行中' : (item.status === 1 ? '待结算' : '已完成')}}
+          </view>
+        </view>
+        <view class="order-info">
+          <view class="time-row">
+            <view class="info-item start">
+              <text class="info-label">起租时间</text>
+              <text class="info-value">{{item.startTime || '-'}}</text>
+            </view>
+            <view class="info-item end">
+              <text class="info-label">到期时间</text>
+              <text class="info-value">{{item.expireTime || '-'}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="order-renter">
+          <text class="renter-name">👤 {{item.renterName || '-'}}</text>
+          <text class="renter-phone">{{item.renterPhone || '-'}}</text>
+        </view>
+      </view>
+    </block>
+
+    <view class="empty-state" wx:if="{{orders.length === 0}}">
+      <text>暂无订单数据</text>
+    </view>
+  </scroll-view>
+</view>

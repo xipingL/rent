@@ -1,0 +1,68 @@
+<!--pages/garage/garage.wxml-->
+<view class="container">
+  <!-- 头部 -->
+  <view class="header">
+    <view class="header-left">
+      <view class="back-btn" bindtap="goBack">←</view>
+      <view class="header-title">我的车库</view>
+    </view>
+    <view class="add-btn" bindtap="goToAdd">+</view>
+  </view>
+
+  <!-- 标签页 -->
+  <view class="tabs">
+    <view class="tab {{currentTab === 0 ? 'active' : ''}}" bindtap="switchTab" data-idx="0">全部</view>
+    <view class="tab {{currentTab === 1 ? 'active' : ''}}" bindtap="switchTab" data-idx="1">空闲</view>
+    <view class="tab {{currentTab === 2 ? 'active' : ''}}" bindtap="switchTab" data-idx="2">租聘中</view>
+    <view class="tab {{currentTab === 3 ? 'active' : ''}}" bindtap="switchTab" data-idx="3">待结算</view>
+  </view>
+
+  <!-- 内容区 -->
+  <scroll-view class="content" scroll-y>
+    <block wx:for="{{vehicles}}" wx:key="_id">
+      <view class="vehicle-card" wx:if="{{currentTab === 0 || item.status === filterStatus[currentTab]}}">
+        <view class="vehicle-image" bindtap="goToDetail" data-id="{{item._id}}">
+          <image class="vehicle-img" src="{{item.image}}"></image>
+          <view class="vehicle-status status-{{item.status}}">{{statusText[item.status]}}</view>
+        </view>
+        <view class="vehicle-info">
+          <view class="vehicle-header">
+            <view>
+              <view class="vehicle-name">{{item.name}}</view>
+              <text class="vehicle-brand">{{item.brand}}</text>
+            </view>
+          </view>
+          <view class="info-grid">
+            <view class="info-item">
+              <text class="info-label">车架号</text>
+              <text class="info-value">{{item.frameNo}}</text>
+            </view>
+            <view class="info-item">
+              <text class="info-label">颜色</text>
+              <text class="info-value">{{item.color}}</text>
+            </view>
+            <view class="info-item">
+              <text class="info-label">牌照号</text>
+              <text class="info-value license">{{item.plateNo}}</text>
+            </view>
+            <view class="info-item">
+              <text class="info-label">电池型号</text>
+              <text class="info-value">{{item.battery}}</text>
+            </view>
+          </view>
+          <view class="vehicle-note" wx:if="{{item.note}}">
+            <text class="note-label">备注</text>
+            <text>{{item.note}}</text>
+          </view>
+          <view class="vehicle-actions">
+            <button class="action-btn btn-rent {{item.status === 0 ? 'btn-wide' : ''}}" wx:if="{{item.status === 0}}" catchtap="goToRental" data-id="{{item._id}}">租聘</button>
+            <button class="action-btn btn-renew" wx:if="{{item.status === 1 || item.status === 2}}" catchtap="goToRenew" data-id="{{item._id}}">续租</button>
+            <button class="action-btn btn-settle" wx:if="{{item.status === 1 || item.status === 2}}" catchtap="goToSettle" data-id="{{item._id}}">结算</button>
+            <button class="action-btn btn-edit {{item.status === 0 ? 'btn-wide' : ''}}" catchtap="goToEdit" data-id="{{item._id}}">编辑</button>
+            <button class="action-btn btn-delete {{item.status === 0 ? 'btn-wide' : ''}}" catchtap="deleteVehicle" data-id="{{item._id}}">删除</button>
+          </view>
+        </view>
+      </view>
+    </block>
+  </scroll-view>
+</view>

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>租聘车辆 - 电瓶车租赁管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .phone {
+            width: 375px;
+            height: 812px;
+            background: #f8f9fa;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00d4aa 0%, #00b894 100%);
+            padding: 16px 24px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .content {
+            padding: 0;
+            height: calc(100% - 140px);
+            overflow-y: auto;
+        }
+
+        /* 车辆信息卡片 */
+        .vehicle-card {
+            background: #ffffff;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .vehicle-thumb {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+
+        .vehicle-info {
+            flex: 1;
+        }
+
+        .vehicle-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3436;
+        }
+
+        .vehicle-detail {
+            font-size: 12px;
+            color: #636e72;
+            margin-top: 4px;
+        }
+
+        .vehicle-status {
+            font-size: 11px;
+            color: #00b894;
+            background: #e8f8f5;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-top: 4px;
+            display: inline-block;
+        }
+
+        /* 表单区域 */
+        .form-section {
+            background: #ffffff;
+            padding: 20px;
+            margin-top: 12px;
+        }
+
+        .form-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3436;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f1f2f6;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            color: #636e72;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #dfe6e9;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #2d3436;
+            background: #f8f9fa;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #00d4aa;
+            background: #ffffff;
+        }
+
+        /* 身份证照片 */
+        .id-photos {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .id-photo-item {
+            aspect-ratio: 1.4;
+            background: #f1f2f6;
+            border: 2px dashed #dfe6e9;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .id-photo-item:hover {
+            border-color: #00d4aa;
+        }
+
+        .id-photo-item.has-photo {
+            background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+            border: none;
+        }
+
+        .id-photo-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .id-photo-text {
+            font-size: 12px;
+            color: #636e72;
+        }
+
+        .id-photo-item.has-photo .id-photo-text {
+            color: #2d3436;
+        }
+
+        /* 车辆照片 */
+        .vehicle-photos {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .photo-item {
+            aspect-ratio: 1;
+            background: #f1f2f6;
+            border: 2px dashed #dfe6e9;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .photo-item.add {
+            font-size: 20px;
+            color: #b2bec3;
+        }
+
+        /* 租聘时长 */
+        .duration-options {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .duration-btn {
+            padding: 10px 16px;
+            background: #f1f2f6;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #636e72;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .duration-btn.active {
+            background: linear-gradient(135deg, #00d4aa 0%, #00b894 100%);
+            color: #ffffff;
+        }
+
+        /* 到期时间 */
+        .expire-time {
+            background: #e8f8f5;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .expire-label {
+            font-size: 13px;
+            color: #636e72;
+        }
+
+        .expire-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #00b894;
+        }
+
+        /* 提交按钮 */
+        .submit-section {
+            padding: 20px;
+            background: #ffffff;
+            margin-top: 12px;
+            padding-bottom: 40px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00d4aa 0%, #00b894 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #b2bec3;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: #00d4aa;
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>📶 🔋</span>
+        </div>
+
+        <!-- 头部 -->
+        <div class="header">
+            <div class="header-left">
+                <div class="back-btn">←</div>
+                <div class="header-title">租聘车辆</div>
+            </div>
+        </div>
+
+        <!-- 内容区 -->
+        <div class="content">
+            <!-- 车辆信息 -->
+            <div class="vehicle-card">
+                <div class="vehicle-thumb">🛵</div>
+                <div class="vehicle-info">
+                    <div class="vehicle-name">雅迪DT3</div>
+                    <div class="vehicle-detail">A88888 · 石墨黑 · 72V 23Ah</div>
+                    <span class="vehicle-status">空闲车辆</span>
+                </div>
+            </div>
+
+            <!-- 租车人信息 -->
+            <div class="form-section">
+                <div class="form-title">租车人信息</div>
+
+                <div class="form-group">
+                    <label class="form-label">姓名</label>
+                    <input type="text" class="form-input" placeholder="请输入租车人姓名">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">手机号码</label>
+                    <input type="tel" class="form-input" placeholder="请输入手机号码">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">身份证照片</label>
+                    <div class="id-photos">
+                        <div class="id-photo-item">
+                            <span class="id-photo-icon">📷</span>
+                            <span class="id-photo-text">身份证正面</span>
+                        </div>
+                        <div class="id-photo-item">
+                            <span class="id-photo-icon">📷</span>
+                            <span class="id-photo-text">身份证反面</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 车辆照片 -->
+            <div class="form-section">
+                <div class="form-title">车辆照片</div>
+                <div class="vehicle-photos">
+                    <div class="photo-item">🛵</div>
+                    <div class="photo-item">🔋</div>
+                    <div class="photo-item">📷</div>
+                    <div class="photo-item">🛑</div>
+                    <div class="photo-item">⚙️</div>
+                    <div class="photo-item add">+</div>
+                </div>
+            </div>
+
+            <!-- 租聘信息 -->
+            <div class="form-section">
+                <div class="form-title">租聘信息</div>
+
+                <div class="form-group">
+                    <label class="form-label">起租时间</label>
+                    <input type="datetime-local" class="form-input" value="2024-01-15T09:30">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">租聘时长</label>
+                    <div class="duration-options">
+                        <button class="duration-btn">1天</button>
+                        <button class="duration-btn">3天</button>
+                        <button class="duration-btn active">7天</button>
+                        <button class="duration-btn">15天</button>
+                        <button class="duration-btn">30天</button>
+                        <button class="duration-btn">自定义</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">到期时间</label>
+                    <div class="expire-time">
+                        <span class="expire-label">预计归还时间</span>
+                        <span class="expire-value">2024-01-22 09:30</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 提交按钮 -->
+            <div class="submit-section">
+                <button class="submit-btn">确认租聘</button>
+            </div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span>首页</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">📋</span>
+                <span>订单</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span>统计</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">👤</span>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

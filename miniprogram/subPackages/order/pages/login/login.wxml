@@ -1,0 +1,12 @@
+<!--pages/login/login.wxml-->
+<view class="container">
+  <view class="login-content">
+    <view class="logo">🛵</view>
+    <view class="title">电瓶车租赁</view>
+    <view class="subtitle">请先授权登录</view>
+
+    <button class="login-btn" bindtap="handleLogin" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">
+      <text class="btn-text">微信授权登录</text>
+    </button>
+  </view>
+</view>

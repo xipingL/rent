@@ -1,0 +1,279 @@
+/* pages/renew/renew.wxss */
+.container {
+  min-height: 100vh;
+  background: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  width: 100%;
+  background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);
+  padding: 32rpx 48rpx;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.back-btn {
+  width: 72rpx;
+  height: 72rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+}
+
+.header-title {
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+.loading-view {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #636e72;
+  font-size: 28rpx;
+}
+
+.content {
+  padding: 0;
+  flex: 1;
+  height: calc(100vh - 160rpx);
+}
+
+.vehicle-card {
+  background: #fff;
+  padding: 32rpx 40rpx;
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.vehicle-thumb {
+  width: 120rpx;
+  height: 120rpx;
+  background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60rpx;
+}
+
+.vehicle-info {
+  flex: 1;
+}
+
+.vehicle-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #2d3436;
+}
+
+.vehicle-detail {
+  font-size: 24rpx;
+  color: #636e72;
+  margin-top: 8rpx;
+}
+
+.vehicle-status {
+  font-size: 22rpx;
+  color: #fff;
+  background: #F7CD73;
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+  margin-top: 8rpx;
+  display: inline-block;
+  font-weight: 600;
+}
+
+.remaining-time {
+  background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);
+  padding: 32rpx 40rpx;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.remaining-label {
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+.remaining-value {
+  font-size: 40rpx;
+  font-weight: 700;
+}
+
+.remaining-value.expired {
+  color: #ffeaea;
+}
+
+.form-section {
+  background: #fff;
+  padding: 40rpx;
+  margin-top: 24rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #2d3436;
+  margin-bottom: 24rpx;
+}
+
+.rental-card {
+  background: #f8f9fa;
+  border-radius: 24rpx;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+}
+
+.rental-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.rental-type {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #2d3436;
+}
+
+.rental-duration {
+  font-size: 24rpx;
+  color: #636e72;
+  background: #dfe6e9;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+.rental-dates {
+  display: flex;
+  justify-content: space-between;
+  font-size: 24rpx;
+  color: #636e72;
+  margin-bottom: 16rpx;
+}
+
+.rental-user {
+  font-size: 24rpx;
+  color: #636e72;
+  padding-top: 16rpx;
+  border-top: 2rpx solid #dfe6e9;
+  display: block;
+}
+
+.form-group {
+  margin-bottom: 32rpx;
+}
+
+.form-label {
+  font-size: 24rpx;
+  color: #636e72;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.form-input {
+  width: 100%;
+  height: 88rpx;
+  padding: 0 32rpx;
+  border: 2rpx solid #dfe6e9;
+  border-radius: 20rpx;
+  font-size: 28rpx;
+  color: #2d3436;
+  background: #f8f9fa;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
+.picker-input {
+  width: 100%;
+  height: 88rpx;
+  padding: 0 32rpx;
+  border: 2rpx solid #dfe6e9;
+  border-radius: 20rpx;
+  font-size: 28rpx;
+  color: #2d3436;
+  background: #f8f9fa;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
+.duration-options {
+  display: flex;
+  gap: 16rpx;
+  flex-wrap: wrap;
+}
+
+.duration-btn {
+  padding: 20rpx 32rpx;
+  background: #f1f2f6;
+  border-radius: 20rpx;
+  font-size: 26rpx;
+  color: #636e72;
+}
+
+.duration-btn.active {
+  background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);
+  color: #fff;
+}
+
+.expire-time {
+  background: #fef9e7;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 26rpx;
+  color: #636e72;
+}
+
+.expire-value {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #f39c12;
+}
+
+.empty-tip {
+  text-align: center;
+  color: #b2bec3;
+  font-size: 28rpx;
+  padding: 40rpx;
+}
+
+.submit-section {
+  padding: 40rpx;
+  background: #fff;
+  margin-top: 24rpx;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 32rpx;
+  background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);
+  color: #fff;
+  border: none;
+  border-radius: 24rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+}

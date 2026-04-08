@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电瓶车租赁管理 - 首页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .phone {
+            width: 375px;
+            height: 812px;
+            background: #ffffff;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00d4aa 0%, #00b894 100%);
+            padding: 30px 24px;
+            color: #ffffff;
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .stats {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .content {
+            padding: 24px;
+            background: #f8f9fa;
+            min-height: calc(100% - 250px);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3436;
+            margin-bottom: 16px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .menu-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 28px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        /* 我的车库 - 占主导 */
+        .menu-card.garage-card {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+            padding: 40px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-card.garage-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+        }
+
+        .menu-card.garage-card .menu-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .menu-card.garage-card .menu-text {
+            color: #ffffff;
+            font-size: 24px;
+            margin-top: 16px;
+        }
+
+        .menu-card.garage-card .menu-desc {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+        }
+
+        .menu-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 28px;
+        }
+
+        .menu-icon.rent {
+            background: linear-gradient(135deg, #00d4aa 0%, #00b894 100%);
+        }
+
+        .menu-icon.return {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a55eea 100%);
+        }
+
+        .menu-icon.renew {
+            background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);
+        }
+
+        .menu-icon.garage {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        }
+
+        .menu-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3436;
+        }
+
+        .menu-desc {
+            font-size: 12px;
+            color: #636e72;
+            margin-top: 4px;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #b2bec3;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: #00d4aa;
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>📶 🔋</span>
+        </div>
+
+        <!-- 头部 -->
+        <div class="header">
+            <div class="header-title">电瓶车租赁</div>
+            <div class="header-subtitle">商家管理平台</div>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number">128</div>
+                    <div class="stat-label">在租车辆</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">36</div>
+                    <div class="stat-label">今日订单</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">¥8.6k</div>
+                    <div class="stat-label">今日收入</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 内容区 -->
+        <div class="content">
+            <div class="section-title">核心功能</div>
+            <div class="grid">
+                <div class="menu-card garage-card">
+                    <div class="menu-icon garage">🏠</div>
+                    <div class="menu-text">我的车库</div>
+                    <div class="menu-desc">管理您的全部车辆</div>
+                </div>
+                <div class="menu-card">
+                    <div class="menu-icon rent">🚲</div>
+                    <div class="menu-text">租聘/续租</div>
+                    <div class="menu-desc">租赁车辆</div>
+                </div>
+                <div class="menu-card">
+                    <div class="menu-icon return">↩️</div>
+                    <div class="menu-text">退租</div>
+                    <div class="menu-desc">车辆退还</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span>首页</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">📋</span>
+                <span>订单</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span>统计</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">👤</span>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

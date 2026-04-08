@@ -1,0 +1,206 @@
+/* pages/order-history/order-history.wxss */
+.container {
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.status-bar {
+  height: 44rpx;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.header {
+  background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+  padding: 32rpx 48rpx;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.back-btn {
+  width: 72rpx;
+  height: 72rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+}
+
+.header-title {
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+.search-bar {
+  background: #ffffff;
+  padding: 24rpx 32rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.search-row.time-range {
+  margin-top: 20rpx;
+}
+
+.search-icon {
+  color: #b2bec3;
+  font-size: 32rpx;
+}
+
+.search-input {
+  flex: 1;
+  padding: 16rpx 0;
+  border: none;
+  background: transparent;
+  font-size: 28rpx;
+  color: #2d3436;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: #b2bec3;
+}
+
+.time-input {
+  flex: 1;
+  padding: 16rpx 20rpx;
+  border: 2rpx solid #dfe6e9;
+  border-radius: 16rpx;
+  background: #f8f9fa;
+  font-size: 24rpx;
+  color: #636e72;
+}
+
+.time-label {
+  font-size: 24rpx;
+  color: #b2bec3;
+  min-width: 56rpx;
+  text-align: center;
+}
+
+.content {
+  padding: 32rpx;
+  height: calc(100vh - 320rpx);
+}
+
+.order-card {
+  background: #ffffff;
+  border-radius: 32rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 8rpx 40rpx rgba(0, 0, 0, 0.06);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.order-vehicle {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.vehicle-thumb {
+  width: 80rpx;
+  height: 80rpx;
+  background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+}
+
+.vehicle-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #2d3436;
+}
+
+.vehicle-plate {
+  font-size: 24rpx;
+  color: #636e72;
+}
+
+.order-status {
+  font-size: 22rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
+  font-weight: 500;
+}
+
+.status-completed {
+  background: #e8f8f5;
+  color: #00b894;
+}
+
+.order-info {
+  padding: 24rpx 0;
+  border-top: 2rpx solid #f1f2f6;
+  border-bottom: 2rpx solid #f1f2f6;
+}
+
+.time-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.info-item.start {
+  flex: 1;
+}
+
+.info-item.end {
+  flex: 1;
+  text-align: right;
+}
+
+.info-label {
+  font-size: 20rpx;
+  color: #b2bec3;
+}
+
+.info-value {
+  font-size: 24rpx;
+  color: #2d3436;
+}
+
+.order-renter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 24rpx;
+}
+
+.renter-name {
+  font-size: 26rpx;
+  color: #2d3436;
+}
+
+.renter-phone {
+  font-size: 24rpx;
+  color: #636e72;
+}

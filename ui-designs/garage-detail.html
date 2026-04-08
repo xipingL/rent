@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>车辆详情 - 电瓶车租赁管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .phone {
+            width: 375px;
+            height: 812px;
+            background: #f8f9fa;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+            padding: 16px 24px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .content {
+            padding: 0;
+            height: calc(100% - 140px);
+            overflow-y: auto;
+        }
+
+        /* 封面区域 */
+        .cover-section {
+            position: relative;
+            height: 200px;
+            background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+        }
+
+        .vehicle-status {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .status-renting {
+            background: #fdcb6e;
+            color: #d35400;
+        }
+
+        .status-available {
+            background: #00b894;
+            color: #ffffff;
+        }
+
+        /* 车辆信息 */
+        .info-section {
+            background: #ffffff;
+            padding: 20px;
+        }
+
+        .info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .vehicle-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3436;
+        }
+
+        .vehicle-brand {
+            font-size: 12px;
+            color: #636e72;
+            background: #f1f2f6;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: #b2bec3;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #2d3436;
+            font-weight: 500;
+        }
+
+        .info-value.license {
+            background: #dfe6e9;
+            padding: 6px 10px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .info-note {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #f1f2f6;
+        }
+
+        .note-label {
+            font-size: 11px;
+            color: #b2bec3;
+            margin-bottom: 4px;
+        }
+
+        .note-content {
+            font-size: 14px;
+            color: #636e72;
+        }
+
+        /* 照片区域 */
+        .photos-section {
+            background: #ffffff;
+            padding: 20px;
+            margin-top: 12px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3436;
+            margin-bottom: 12px;
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .photo-item {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+
+        /* 租聘记录 */
+        .rental-section {
+            background: #ffffff;
+            padding: 20px;
+            margin-top: 12px;
+            padding-bottom: 40px;
+        }
+
+        .rental-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .rental-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .rental-user {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2d3436;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rental-phone {
+            font-size: 13px;
+            color: #636e72;
+        }
+
+        .rental-dates {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .rental-date {
+            flex: 1;
+        }
+
+        .date-label {
+            font-size: 11px;
+            color: #b2bec3;
+            margin-bottom: 4px;
+        }
+
+        .date-value {
+            font-size: 13px;
+            color: #2d3436;
+        }
+
+        .rental-settle {
+            padding-top: 12px;
+            border-top: 1px solid #dfe6e9;
+        }
+
+        .settle-label {
+            font-size: 11px;
+            color: #b2bec3;
+            margin-bottom: 4px;
+        }
+
+        .settle-value {
+            font-size: 13px;
+            color: #636e72;
+        }
+
+        .empty-rental {
+            text-align: center;
+            padding: 40px 20px;
+            color: #b2bec3;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #b2bec3;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: #0984e3;
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>📶 🔋</span>
+        </div>
+
+        <!-- 头部 -->
+        <div class="header">
+            <div class="header-left">
+                <div class="back-btn">←</div>
+                <div class="header-title">车辆详情</div>
+            </div>
+            <div class="header-actions">
+                <div class="action-icon">✏️</div>
+                <div class="action-icon">🗑️</div>
+            </div>
+        </div>
+
+        <!-- 内容区 -->
+        <div class="content">
+            <!-- 封面 -->
+            <div class="cover-section">
+                🛵
+                <span class="vehicle-status status-renting">租聘中</span>
+            </div>
+
+            <!-- 车辆信息 -->
+            <div class="info-section">
+                <div class="info-header">
+                    <div>
+                        <div class="vehicle-name">雅迪DT3</div>
+                        <span class="vehicle-brand">雅迪</span>
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">车架号</span>
+                        <span class="info-value">L5Y2023A12345</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">牌照号</span>
+                        <span class="info-value license">A88888</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">颜色</span>
+                        <span class="info-value">石墨黑</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">电池型号</span>
+                        <span class="info-value">72V 23Ah</span>
+                    </div>
+                </div>
+
+                <div class="info-note">
+                    <div class="note-label">备注</div>
+                    <div class="note-content">车身有轻微划痕，后视镜需更换</div>
+                </div>
+            </div>
+
+            <!-- 车辆照片 -->
+            <div class="photos-section">
+                <div class="section-title">车辆照片</div>
+                <div class="photos-grid">
+                    <div class="photo-item">🛵</div>
+                    <div class="photo-item">🔧</div>
+                    <div class="photo-item">🔋</div>
+                    <div class="photo-item">📷</div>
+                    <div class="photo-item">🛑</div>
+                    <div class="photo-item">⚙️</div>
+                </div>
+            </div>
+
+            <!-- 租聘记录 -->
+            <div class="rental-section">
+                <div class="section-title">往期租聘记录</div>
+
+                <!-- 租聘记录1 -->
+                <div class="rental-card">
+                    <div class="rental-header">
+                        <div class="rental-user">👤 张三</div>
+                        <div class="rental-phone">138****8888</div>
+                    </div>
+                    <div class="rental-dates">
+                        <div class="rental-date">
+                            <div class="date-label">起租时间</div>
+                            <div class="date-value">2024-01-15 09:30</div>
+                        </div>
+                        <div class="rental-date">
+                            <div class="date-label">退租时间</div>
+                            <div class="date-value">2024-01-20 18:20</div>
+                        </div>
+                    </div>
+                    <div class="rental-settle">
+                        <div class="settle-label">结算备注</div>
+                        <div class="settle-value">租期5天，费用已结清，车辆检查无异常</div>
+                    </div>
+                </div>
+
+                <!-- 租聘记录2 -->
+                <div class="rental-card">
+                    <div class="rental-header">
+                        <div class="rental-user">👤 李四</div>
+                        <div class="rental-phone">139****9999</div>
+                    </div>
+                    <div class="rental-dates">
+                        <div class="rental-date">
+                            <div class="date-label">起租时间</div>
+                            <div class="date-value">2024-01-08 14:00</div>
+                        </div>
+                        <div class="rental-date">
+                            <div class="date-label">退租时间</div>
+                            <div class="date-value">2024-01-10 10:15</div>
+                        </div>
+                    </div>
+                    <div class="rental-settle">
+                        <div class="settle-label">结算备注</div>
+                        <div class="settle-value">租期2天，提前归还，费用已结清</div>
+                    </div>
+                </div>
+
+                <!-- 租聘记录3 -->
+                <div class="rental-card">
+                    <div class="rental-header">
+                        <div class="rental-user">👤 王五</div>
+                        <div class="rental-phone">137****7777</div>
+                    </div>
+                    <div class="rental-dates">
+                        <div class="rental-date">
+                            <div class="date-label">起租时间</div>
+                            <div class="date-value">2023-12-28 11:00</div>
+                        </div>
+                        <div class="rental-date">
+                            <div class="date-label">退租时间</div>
+                            <div class="date-value">2024-01-03 16:30</div>
+                        </div>
+                    </div>
+                    <div class="rental-settle">
+                        <div class="settle-label">结算备注</div>
+                        <div class="settle-value">跨年租赁共6天，费用已结清，无异常</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <span class="nav-icon">🏠</span>
+                <span>首页</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">📋</span>
+                <span>订单</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span>统计</span>
+            </div>
+            <div class="nav-item active">
+                <span class="nav-icon">👤</span>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!--pages/orders/orders.wxml-->
+<view class="container">
+  <!-- 头部 -->
+  <view class="header">
+    <view class="header-title">订单</view>
+    <view class="header-subtitle">正在进行的租聘</view>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading-view" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 内容区 -->
+  <scroll-view class="content" scroll-y wx:else>
+    <!-- 待结算 (status = 1) -->
+    <view class="section-title" style="margin-top: 24rpx;">
+      <text>待结算</text>
+      <text class="section-badge warning">{{status1Orders.length}}</text>
+    </view>
+
+    <view class="order-card pending" wx:for="{{status1Orders}}" wx:key="_id">
+      <view class="order-header">
+        <view class="order-vehicle">
+          <image class="vehicle-thumb" wx:if="{{item.carCoverUrl}}" src="{{item.carCoverUrl}}" mode="aspectFill"></image>
+          <view class="vehicle-thumb" wx:else>🛵</view>
+          <view>
+            <view class="vehicle-name">{{item.carName || '未知车辆'}}</view>
+            <view class="vehicle-plate">{{item.carPlateNo || '无牌照'}}</view>
+          </view>
+        </view>
+        <text class="order-status status-pending">待结算</text>
+      </view>
+      <view class="remaining-time">
+        <text class="remaining-label">已超时</text>
+        <text class="remaining-value urgent">{{item.remainingText}}</text>
+      </view>
+      <view class="renter-info">
+        <text class="renter-name">👤 {{item.renterName}}</text>
+        <text class="renter-phone">{{item.renterPhone}}</text>
+      </view>
+      <view class="order-actions">
+        <button class="action-btn btn-settle" data-id="{{item.carId}}" bindtap="goToSettle">结算</button>
+      </view>
+    </view>
+
+    <!-- 租聘中 (status = 0) -->
+    <view class="section-title" style="margin-top: 48rpx;">
+      <text>租聘中</text>
+      <text class="section-badge">{{status0Orders.length}}</text>
+    </view>
+
+    <view class="order-card renting" wx:for="{{status0Orders}}" wx:key="_id">
+      <view class="order-header">
+        <view class="order-vehicle">
+          <image class="vehicle-thumb" wx:if="{{item.carCoverUrl}}" src="{{item.carCoverUrl}}" mode="aspectFill"></image>
+          <view class="vehicle-thumb" wx:else>🛵</view>
+          <view>
+            <view class="vehicle-name">{{item.carName || '未知车辆'}}</view>
+            <view class="vehicle-plate">{{item.carPlateNo || '无牌照'}}</view>
+          </view>
+        </view>
+        <text class="order-status status-renting">租聘中</text>
+      </view>
+      <view class="remaining-time">
+        <text class="remaining-label">剩余时间</text>
+        <text class="remaining-value">{{item.remainingText}}</text>
+      </view>
+      <view class="renter-info">
+        <text class="renter-name">👤 {{item.renterName}}</text>
+        <text class="renter-phone">{{item.renterPhone}}</text>
+      </view>
+      <view class="order-actions">
+        <button class="action-btn btn-renew" data-id="{{item.carId}}" bindtap="goToRenew">续租</button>
+        <button class="action-btn btn-settle" data-id="{{item.carId}}" bindtap="goToSettle">结算</button>
+      </view>
+    </view>
+
+    <!-- 无订单 -->
+    <view class="empty-tip" wx:if="{{orders.length === 0 && !loading}}">
+      <text>暂无进行中的订单</text>
+    </view>
+  </scroll-view>
+</view>

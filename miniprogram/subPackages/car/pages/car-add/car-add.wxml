@@ -1,0 +1,72 @@
+<!--pages/car-add/car-add.wxml-->
+<view class="container">
+  <view class="header">
+    <view class="header-left">
+      <view class="back-btn" bindtap="goBack">←</view>
+      <view class="header-title">新增车辆</view>
+    </view>
+  </view>
+
+  <scroll-view class="content" scroll-y>
+    <view class="cover-section" bindtap="chooseCover">
+      <image wx:if="{{coverTempPath}}" class="cover-img" src="{{coverTempPath}}" mode="aspectFill"></image>
+      <text wx:else class="cover-emoji">🛵</text>
+      <view class="edit-cover-btn">📷 {{coverTempPath ? '修改封面' : '新增封面'}}</view>
+    </view>
+
+    <view class="form-section">
+      <view class="form-title">基本信息</view>
+      <view class="form-row">
+        <view class="form-group">
+          <text class="form-label">车款名</text>
+          <input class="form-input" data-field="name" value="{{formData.name}}" bindinput="onInput" placeholder="请输入车款名"></input>
+        </view>
+        <view class="form-group">
+          <text class="form-label">品牌</text>
+          <input class="form-input" data-field="brand" value="{{formData.brand}}" bindinput="onInput" placeholder="请输入品牌"></input>
+        </view>
+      </view>
+      <view class="form-row">
+        <view class="form-group">
+          <text class="form-label">车架号</text>
+          <input class="form-input" data-field="frameNo" value="{{formData.frameNo}}" bindinput="onInput" placeholder="请输入车架号"></input>
+        </view>
+        <view class="form-group">
+          <text class="form-label">牌照号</text>
+          <input class="form-input" data-field="plateNo" value="{{formData.plateNo}}" bindinput="onInput" placeholder="请输入牌照号"></input>
+        </view>
+      </view>
+      <view class="form-row">
+        <view class="form-group">
+          <text class="form-label">颜色</text>
+          <input class="form-input" data-field="color" value="{{formData.color}}" bindinput="onInput" placeholder="请输入颜色"></input>
+        </view>
+        <view class="form-group">
+          <text class="form-label">电池型号</text>
+          <input class="form-input" data-field="battery" value="{{formData.battery}}" bindinput="onInput" placeholder="请输入电池型号"></input>
+        </view>
+      </view>
+      <view class="form-group">
+        <text class="form-label">备注</text>
+        <input class="form-input" data-field="note" value="{{formData.note}}" bindinput="onInput" placeholder="请输入备注信息"></input>
+      </view>
+    </view>
+
+    <view class="photos-section">
+      <view class="form-title">车辆照片</view>
+      <view class="photos-grid">
+        <block wx:for="{{photosTempPaths}}" wx:key="*this">
+          <view class="photo-item">
+            <image class="photo-img" src="{{item}}" mode="aspectFill"></image>
+            <view class="photo-delete" bindtap="deletePhoto" data-index="{{index}}">×</view>
+          </view>
+        </block>
+        <view class="photo-item add" bindtap="choosePhoto">+</view>
+      </view>
+    </view>
+
+    <view class="submit-section">
+      <button class="submit-btn" bindtap="saveVehicle">新增车辆</button>
+    </view>
+  </scroll-view>
+</view>

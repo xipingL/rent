@@ -1,0 +1,208 @@
+/* pages/orders/orders.wxss */
+.container {
+  min-height: 100vh;
+  background: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  width: 100%;
+  background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+  padding: 40rpx 48rpx;
+  color: #ffffff;
+  box-sizing: border-box;
+}
+
+.header-title {
+  font-size: 44rpx;
+  font-weight: 700;
+}
+
+.header-subtitle {
+  font-size: 26rpx;
+  opacity: 0.9;
+  margin-top: 8rpx;
+}
+
+.loading-view {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #636e72;
+  font-size: 28rpx;
+}
+
+.content {
+  padding: 24rpx;
+  flex: 1;
+  height: calc(100vh - 200rpx);
+  box-sizing: border-box;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #2d3436;
+  margin-bottom: 24rpx;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.section-badge {
+  background: #e17055;
+  color: #ffffff;
+  font-size: 22rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.section-badge.warning {
+  background: #f39c12;
+}
+
+.order-card {
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  position: relative;
+}
+
+.order-card.pending {
+  border-left: 8rpx solid #e17055;
+}
+
+.order-card.renting {
+  border-left: 8rpx solid #00b894;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.order-vehicle {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.vehicle-thumb {
+  width: 90rpx;
+  height: 90rpx;
+  background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44rpx;
+  overflow: hidden;
+}
+
+.vehicle-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #2d3436;
+}
+
+.vehicle-plate {
+  font-size: 24rpx;
+  color: #636e72;
+}
+
+.order-status {
+  font-size: 22rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
+  font-weight: 500;
+}
+
+.status-pending {
+  background: #ffeaea;
+  color: #e17055;
+}
+
+.status-renting {
+  background: #e8f8f5;
+  color: #00b894;
+}
+
+.remaining-time {
+  background: #f8f9fa;
+  border-radius: 24rpx;
+  padding: 28rpx;
+  text-align: center;
+  margin-bottom: 24rpx;
+}
+
+.remaining-label {
+  font-size: 22rpx;
+  color: #b2bec3;
+  margin-bottom: 8rpx;
+  display: block;
+}
+
+.remaining-value {
+  font-size: 44rpx;
+  font-weight: 700;
+}
+
+.remaining-value.urgent {
+  color: #e74c3c;
+}
+
+.renter-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 24rpx;
+  border-top: 2rpx solid #f1f2f6;
+}
+
+.renter-name {
+  font-size: 26rpx;
+  color: #2d3436;
+}
+
+.renter-phone {
+  font-size: 24rpx;
+  color: #636e72;
+}
+
+.order-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 20rpx 0;
+  border-radius: 20rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  text-align: center;
+  border: none;
+}
+
+.btn-renew {
+  background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);
+  color: #ffffff;
+}
+
+.btn-settle {
+  background: linear-gradient(135deg, #6c5ce7 0%, #a55eea 100%);
+  color: #ffffff;
+}
+
+.empty-tip {
+  text-align: center;
+  color: #b2bec3;
+  font-size: 28rpx;
+  padding: 100rpx 40rpx;
+}
