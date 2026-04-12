@@ -24,9 +24,8 @@
 
   <!-- 内容区 -->
   <scroll-view class="content" scroll-y>
-    <block wx:for="{{vehicles}}" wx:key="_id">
-      <!-- 选择模式下的车辆卡片 -->
-      <view class="vehicle-card" wx:if="{{(selectMode && (currentTab === 0 || item.status === filterStatus[currentTab])) || (!selectMode && (currentTab === 0 || item.status === filterStatus[currentTab]))}}">
+    <block wx:for="{{filteredVehicles}}" wx:key="_id">
+      <view class="vehicle-card">
         <view class="vehicle-image" bindtap="{{selectMode ? 'selectVehicle' : 'goToDetail'}}" data-id="{{item._id}}" data-status="{{item.status}}">
           <image class="vehicle-img" src="{{item.image}}"></image>
           <view class="vehicle-status status-{{item.status}}">{{statusText[item.status]}}</view>

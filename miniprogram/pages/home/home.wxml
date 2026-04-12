@@ -34,17 +34,22 @@
         <text class="garage-desc">管理您的全部车辆</text>
       </view>
 
-      <!-- 两个功能卡片 -->
+      <!-- 三个功能卡片 -->
       <view class="func-row">
         <view class="func-card" bindtap="goToRental">
-          <view class="func-icon">🚲</view>
+          <view class="func-icon">🔑</view>
           <text class="func-title">租聘</text>
-          <text class="func-desc">租聘车辆</text>
+          <text class="func-desc">开始租车</text>
+        </view>
+        <view class="func-card" bindtap="goToRenew">
+          <view class="func-icon">🔄</view>
+          <text class="func-title">续租</text>
+          <text class="func-desc">延长租期</text>
         </view>
         <view class="func-card" bindtap="goToSettle">
-          <view class="func-icon">↩️</view>
-          <text class="func-title">退租</text>
-          <text class="func-desc">车辆退还</text>
+          <view class="func-icon">🧾</view>
+          <text class="func-title">结算</text>
+          <text class="func-desc">费用结算</text>
         </view>
       </view>
     </view>

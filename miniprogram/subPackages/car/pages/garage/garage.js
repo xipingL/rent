@@ -11,25 +11,30 @@ Page({
       2: '待结算'
     },
     vehicles: [],
+    filteredVehicles: [],  // 过滤后的车辆列表
     selectMode: '',  // '' | 'rental' | 'settle' | 'renew'
     selectHint: ''
   },
 
   onLoad(options) {
     // 处理从首页跳转过来的场景
-    if (options.action) {
-      const actionMap = {
-        rental: { mode: 'rental', hint: '请选择要租聘的车辆' },
-        settle: { mode: 'settle', hint: '请选择要结算的车辆' },
-        renew: { mode: 'renew', hint: '请选择要续租的车辆' }
+    if (options.carStatus !== undefined) {
+      const carStatus = parseInt(options.carStatus)
+      // currentTab: 0=全部, 1=空闲(0), 2=租聘中(1), 3=待结算(2)
+      const tabMap = { 0: 1, 1: 2, 2: 3 }
+      const statusMap = {
+        0: { mode: 'rental', hint: '请选择要租聘的车辆', title: '租聘' },
+        1: { mode: 'renew', hint: '请选择要续租的车辆', title: '续租' },
+        2: { mode: 'settle', hint: '请选择要结算的车辆', title: '结算' }
       }
-      const config = actionMap[options.action]
+      const config = statusMap[carStatus]
       if (config) {
         this.setData({
           selectMode: config.mode,
-          selectHint: config.hint
+          selectHint: config.hint,
+          currentTab: tabMap[carStatus]
         })
-        wx.setNavigationBarTitle({ title: '选择车辆' })
+        wx.setNavigationBarTitle({ title: config.title })
       }
     }
     this.loadVehicles()
@@ -51,8 +56,11 @@ Page({
       .get({
         success: (res) => {
           wx.hideLoading()
+          const { selectMode } = this.data
+          const filteredVehicles = this.filterVehicles(res.data, selectMode)
           this.setData({
-            vehicles: res.data
+            vehicles: res.data,
+            filteredVehicles
           })
           app.globalData.vehicles = res.data
         },
@@ -66,9 +74,61 @@ Page({
 
   // 切换标签页
   switchTab(e) {
+    const tabIndex = parseInt(e.currentTarget.dataset.idx)
+    const { vehicles, selectMode } = this.data
+
+    // 选择模式下，切换标签也要重新过滤
+    let filteredVehicles = vehicles
+    if (selectMode) {
+      filteredVehicles = this.filterVehiclesByTab(vehicles, tabIndex, selectMode)
+    }
+
     this.setData({
-      currentTab: parseInt(e.currentTarget.dataset.idx)
+      currentTab: tabIndex,
+      filteredVehicles
     })
+  },
+
+  // 根据 tab 和 mode 过滤车辆
+  filterVehicles(vehicles, selectMode) {
+    const modeToStatus = {
+      rental: 0,   // 租聘：只显示空闲
+      renew: 1,    // 续租：只显示租聘中
+      settle: 2    // 结算：只显示待结算
+    }
+    const targetStatus = modeToStatus[selectMode]
+    if (targetStatus === undefined) {
+      return vehicles  // 普通模式返回全部
+    }
+    return vehicles.filter(v => v.status === targetStatus)
+  },
+
+  // 根据 tab 过滤（选择模式下）
+  filterVehiclesByTab(vehicles, tabIndex, selectMode) {
+    // tabIndex: 0=全部, 1=空闲(0), 2=租聘中(1), 3=待结算(2)
+    const modeToStatus = {
+      rental: 0,
+      renew: 1,
+      settle: 2
+    }
+
+    // 如果是全部，直接返回该模式对应的状态车辆
+    if (tabIndex === 0) {
+      return this.filterVehicles(vehicles, selectMode)
+    }
+
+    // 如果选择了具体 tab
+    const tabStatusMap = { 1: 0, 2: 1, 3: 2 }
+    const tabStatus = tabStatusMap[tabIndex]
+    const modeStatus = modeToStatus[selectMode]
+
+    // 如果点击的 tab 和 mode 对应的状态一致，显示该状态车辆
+    if (tabStatus === modeStatus) {
+      return vehicles.filter(v => v.status === tabStatus)
+    }
+
+    // 不一致则返回空
+    return []
   },
 
   // 返回上一页
@@ -118,20 +178,9 @@ Page({
   // 选择车辆（选择模式下）
   selectVehicle(e) {
     const id = e.currentTarget.dataset.id
-    const status = parseInt(e.currentTarget.dataset.status)
     const { selectMode } = this.data
 
-    // 根据选择模式和车辆状态判断是否可以操作
-    if (selectMode === 'rental' && status !== 0) {
-      wx.showToast({ title: '只能选择空闲的车辆', icon: 'none' })
-      return
-    }
-    if ((selectMode === 'settle' || selectMode === 'renew') && status === 0) {
-      wx.showToast({ title: '该车辆未在租聘中', icon: 'none' })
-      return
-    }
-
-    // 跳转到对应页面
+    // 直接跳转到对应页面（不需要校验，因为已经过滤过了）
     if (selectMode === 'rental') {
       wx.navigateTo({ url: `/subPackages/order/pages/rental/rental?id=${id}` })
     } else if (selectMode === 'settle') {
@@ -213,8 +262,9 @@ Page({
 
           // 从本地删除
           const vehicles = this.data.vehicles.filter(v => v._id != id)
+          const filteredVehicles = this.filterVehicles(vehicles, this.data.selectMode)
           app.globalData.vehicles = vehicles
-          this.setData({ vehicles })
+          this.setData({ vehicles, filteredVehicles })
           wx.showToast({ title: '删除成功' })
         }
       }

@@ -386,7 +386,7 @@ Page({
 
             wx.hideLoading()
             wx.showToast({ title: '租聘成功', icon: 'success' })
-            setTimeout(() => wx.navigateBack(), 1500)
+            setTimeout(() => wx.redirectTo({ url: '/pages/home/home' }), 1500)
           },
           fail: (err) => {
             wx.hideLoading()

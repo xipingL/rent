@@ -129,18 +129,18 @@
   margin-top: 8rpx;
 }
 
-/* 两个功能卡片横排 */
+/* 三个功能卡片横排 */
 .func-row {
   display: flex;
   justify-content: space-between;
-  gap: 5%;
+  gap: 3%;
 }
 
 .func-row .func-card {
   flex: 1;
   background: #ffffff;
   border-radius: 20rpx;
-  padding: 40rpx 24rpx;
+  padding: 32rpx 16rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -160,24 +160,28 @@
   color: #ffffff;
 }
 
-.func-row .func-card:first-child .func-icon {
+.func-row .func-card:nth-child(1) .func-icon {
   background: #3CC6A0;
 }
 
-.func-row .func-card:last-child .func-icon {
+.func-row .func-card:nth-child(2) .func-icon {
+  background: #F59E0B;
+}
+
+.func-row .func-card:nth-child(3) .func-icon {
   background: #8B5CE6;
 }
 
 .func-row .func-title {
-  font-size: 40rpx;
+  font-size: 36rpx;
   font-weight: 700;
   color: #1a1a1a;
 }
 
 .func-row .func-desc {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #666666;
-  margin-top: 8rpx;
+  margin-top: 6rpx;
 }
 
 /* 快捷操作 */

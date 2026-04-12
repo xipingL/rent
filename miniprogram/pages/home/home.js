@@ -81,19 +81,19 @@ Page({
     wx.navigateTo({ url: '/subPackages/car/pages/garage/garage' });
   },
 
-  // 跳转到租车 - 先选择车辆
+  // 跳转到租车 - 先选择车辆（carStatus=0 空闲）
   goToRental() {
-    wx.navigateTo({ url: '/subPackages/car/pages/garage/garage?action=rental' });
+    wx.navigateTo({ url: '/subPackages/car/pages/garage/garage?carStatus=0' });
   },
 
-  // 跳转到结算（退租）- 先选择车辆
-  goToSettle() {
-    wx.navigateTo({ url: '/subPackages/car/pages/garage/garage?action=settle' });
-  },
-
-  // 跳转到续租 - 先选择车辆
+  // 跳转到续租 - 先选择车辆（carStatus=1 租聘中）
   goToRenew() {
-    wx.navigateTo({ url: '/subPackages/car/pages/garage/garage?action=renew' });
+    wx.navigateTo({ url: '/subPackages/car/pages/garage/garage?carStatus=1' });
+  },
+
+  // 跳转到结算 - 先选择车辆（carStatus=2 待结算）
+  goToSettle() {
+    wx.navigateTo({ url: '/subPackages/car/pages/garage/garage?carStatus=2' });
   },
 
   // 跳转到订单列表
