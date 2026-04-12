@@ -63,6 +63,13 @@ Page({
               order.renterPhone = parentOrder.renterPhone
             }
           }
+          // 格式化日期
+          if (order.startTime) {
+            order.startTimeStr = this.formatDate(order.startTime)
+          }
+          if (order.expireTime) {
+            order.expireTimeStr = this.formatDate(order.expireTime)
+          }
           return order
         })
       }
@@ -82,6 +89,17 @@ Page({
   // 返回上一页
   goBack() {
     wx.navigateBack()
+  },
+
+  // 格式化日期
+  formatDate(date) {
+    if (!date) return '-'
+    const d = date instanceof Date ? date : new Date(date)
+    if (isNaN(d.getTime())) return '-'
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
   },
 
   // 搜索输入

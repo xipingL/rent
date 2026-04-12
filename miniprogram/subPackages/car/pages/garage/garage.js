@@ -23,9 +23,9 @@ Page({
       // currentTab: 0=全部, 1=空闲(0), 2=租聘中(1), 3=待结算(2)
       const tabMap = { 0: 1, 1: 2, 2: 3 }
       const statusMap = {
-        0: { mode: 'rental', hint: '请选择要租聘的车辆', title: '租聘' },
-        1: { mode: 'renew', hint: '请选择要续租的车辆', title: '续租' },
-        2: { mode: 'settle', hint: '请选择要结算的车辆', title: '结算' }
+        0: { mode: 'rental', hint: '点击卡片选择要租聘的车辆', title: '租聘' },
+        1: { mode: 'renew', hint: '点击卡片选择要续租的车辆', title: '续租' },
+        2: { mode: 'settle', hint: '点击卡片选择要结算的车辆', title: '结算' }
       }
       const config = statusMap[carStatus]
       if (config) {
@@ -77,10 +77,17 @@ Page({
     const tabIndex = parseInt(e.currentTarget.dataset.idx)
     const { vehicles, selectMode } = this.data
 
-    // 选择模式下，切换标签也要重新过滤
     let filteredVehicles = vehicles
     if (selectMode) {
+      // 选择模式下按 mode 过滤
       filteredVehicles = this.filterVehiclesByTab(vehicles, tabIndex, selectMode)
+    } else {
+      // 非选择模式下按标签页过滤
+      const tabStatusMap = { 0: null, 1: 0, 2: 1, 3: 2 }  // null=全部
+      const status = tabStatusMap[tabIndex]
+      if (status !== null) {
+        filteredVehicles = vehicles.filter(v => v.status === status)
+      }
     }
 
     this.setData({

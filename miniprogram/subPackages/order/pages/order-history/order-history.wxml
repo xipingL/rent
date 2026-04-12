@@ -46,11 +46,11 @@
           <view class="time-row">
             <view class="info-item start">
               <text class="info-label">起租时间</text>
-              <text class="info-value">{{item.startTime || '-'}}</text>
+              <text class="info-value">{{item.startTimeStr || '-'}}</text>
             </view>
             <view class="info-item end">
               <text class="info-label">到期时间</text>
-              <text class="info-value">{{item.expireTime || '-'}}</text>
+              <text class="info-value">{{item.expireTimeStr || '-'}}</text>
             </view>
           </view>
         </view>
