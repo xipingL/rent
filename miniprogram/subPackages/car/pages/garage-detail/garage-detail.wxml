@@ -6,8 +6,9 @@
       <view class="header-title">车辆详情</view>
     </view>
     <view class="header-actions">
-      <view class="action-icon" bindtap="goToEdit">✏️</view>
-      <view class="action-icon" bindtap="deleteVehicle">🗑️</view>
+      <view class="action-btn rent-btn" wx:if="{{canOperate && vehicle.status === 0}}" bindtap="markAsRented">租出</view>
+      <view class="action-icon" bindtap="goToEdit" wx:if="{{canOperate}}">✏️</view>
+      <view class="action-icon" bindtap="deleteVehicle" wx:if="{{canOperate}}">🗑️</view>
     </view>
   </view>
 
@@ -74,11 +75,11 @@
         <view class="rental-dates">
           <view>
             <text class="date-label">起租时间</text>
-            <text class="date-value">{{item.startTime}}</text>
+            <text class="date-value">{{item.startTimeStr}}</text>
           </view>
           <view>
             <text class="date-label">到期时间</text>
-            <text class="date-value">{{item.expireTime}}</text>
+            <text class="date-value">{{item.expireTimeStr}}</text>
           </view>
         </view>
         <view class="rental-duration">

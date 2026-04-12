@@ -1,4 +1,6 @@
 // pages/order-history/order-history.js
+const app = getApp()
+
 Page({
   data: {
     searchText: '',
@@ -18,10 +20,11 @@ Page({
     const db = wx.cloud.database()
 
     try {
-      // 获取所有未删除的订单
+      // 获取当前用户未删除的订单
       const res = await db.collection('rental')
         .where({
-          is_delete: false
+          is_delete: false,
+          create_by: app.globalData.openId
         })
         .orderBy('startTime', 'desc')
         .get()
@@ -32,10 +35,11 @@ Page({
       const carIds = [...new Set(orders.map(order => order.carId))]
 
       if (carIds.length > 0) {
-        // 查询相关车辆信息
+        // 查询相关车辆信息（同样需要过滤）
         const carRes = await db.collection('car')
           .where({
-            _id: db.command.in(carIds)
+            _id: db.command.in(carIds),
+            create_by: app.globalData.openId
           })
           .get()
 

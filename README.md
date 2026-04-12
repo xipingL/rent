@@ -20,6 +20,7 @@
 | photos | array | 车辆照片的云存储文件ID列表 |
 | status | number | 车辆状态：0=空闲可租，1=租聘中，2=租聘结束待归还 |
 | is_delete | boolean | 是否删除：false=未删除，true=已删除 |
+| create_by | string | 创建人 openId |
 | createTime | Date | 创建时间 |
 
 ---
@@ -46,7 +47,36 @@
 | settlePhotos | array | 结算照片的云存储文件ID列表 |
 | remark | string | 结算备注 |
 | is_delete | boolean | 是否删除：false=未删除，true=已删除 |
+| create_by | string | 操作人 openId |
 | createTime | Date | 创建时间 |
+
+---
+
+### operation_log（操作日志集合）
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| _id | string | 日志ID（自动生成） |
+| operator | string | 操作人 openId |
+| action | string | 操作类型：create/update/delete/rent/renew/settle |
+| collection | string | 被操作集合：car/rental |
+| record_id | string | 被操作记录ID |
+| car_id | string | 关联车辆ID |
+| remark | string | 操作备注（租聘/续租时记录租车人及租期信息） |
+| createTime | Date | 操作时间 |
+
+---
+
+### user（用户集合）
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| _id | string | 用户ID（自动生成） |
+| openId | string | 微信 openId（唯一标识） |
+| name | string | 用户昵称/姓名（默认"商家用户"） |
+| avatar | string | 头像 URL（默认空） |
+| createTime | Date | 注册时间 |
+| updateTime | Date | 更新时间 |
 
 ---
 
@@ -71,3 +101,28 @@
 ## 云开发文档
 
 - [云开发文档](https://developers.weixin.qq.com/miniprogram/dev/wxcloud/basis/getting-started.html)
+
+---
+
+## TODO
+
+- [ ] 商家报表导出功能
+- [ ] 数据库权限规则配置（防止抓包绕过）
+- [ ] 价格/押金体系设计
+- [ ] 逾期费用计算规则
+
+---
+
+## 代码规范
+
+### 变量命名规则
+
+| 类型 | 规则 | 示例 |
+|------|------|------|
+| 普通变量 | camelCase | `userName`, `carId`, `openId` |
+| 常量 | UPPER_SNAKE_CASE | `MAX_COUNT`, `DEFAULT_STATUS` |
+| 函数名 | camelCase + 动词前缀 | `getOpenId()`, `addOperationLog()` |
+| 页面 data | camelCase | `userInfo`, `vehicleList` |
+| 云数据库集合名 | 小写单数 | `car`, `rental`, `user` |
+| 文件名 | kebab-case | `car-add`, `order-history` |
+| CSS 类名 | kebab-case | `.menu-item`, `.avatar-wrapper` |

@@ -79,8 +79,7 @@
         "pages/order-history/order-history",
         "pages/renew/renew",
         "pages/rental/rental",
-        "pages/settle/settle",
-        "pages/login/login"
+        "pages/settle/settle"
       ]
     }
   ]

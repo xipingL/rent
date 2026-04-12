@@ -45,6 +45,14 @@ Page({
         wx.hideLoading()
         if (res.data && res.data.length > 0) {
           const vehicle = res.data[0]
+
+          // 权限校验：只有创建人可以编辑
+          if (vehicle.create_by !== app.globalData.openId) {
+            wx.showToast({ title: '无权编辑此车辆', icon: 'none' })
+            setTimeout(() => wx.navigateBack(), 1500)
+            return
+          }
+
           this.setData({
             loading: false,
             vehicleId: vehicle._id,
@@ -197,6 +205,15 @@ Page({
               updateTime: db.serverDate()
             },
             success: () => {
+              // 写入操作日志
+              app.addOperationLog({
+                collection: 'car',
+                record_id: vehicleId,
+                action: 'update',
+                car_id: vehicleId,
+                remark: '修改车辆信息'
+              })
+
               wx.hideLoading()
               wx.showToast({ title: '修改成功', icon: 'success' })
               setTimeout(() => wx.navigateBack(), 1500)

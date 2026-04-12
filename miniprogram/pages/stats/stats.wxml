@@ -19,30 +19,30 @@
         <view class="chart-title">车辆状态</view>
         <view class="stats-grid">
           <view class="stat-card">
-            <view class="stat-value" style="color: #00b894;">128</view>
+            <view class="stat-value" style="color: #00b894;">{{todayStats.rentingCars}}</view>
             <view class="stat-label">租聘中</view>
           </view>
           <view class="stat-card">
-            <view class="stat-value" style="color: #74b9ff;">42</view>
+            <view class="stat-value" style="color: #74b9ff;">{{todayStats.idleCars}}</view>
             <view class="stat-label">空闲</view>
           </view>
           <view class="stat-card">
-            <view class="stat-value" style="color: #e17055;">8</view>
+            <view class="stat-value" style="color: #e17055;">{{todayStats.pendingSettle}}</view>
             <view class="stat-label">待结算</view>
           </view>
         </view>
       </view>
 
       <view class="chart-section">
-        <view class="chart-title">今日车辆变化</view>
+        <view class="chart-title">今日概况</view>
         <view class="stats-grid">
           <view class="stat-card">
-            <view class="stat-value" style="color: #00b894;">+2</view>
+            <view class="stat-value" style="color: #00b894;">+{{todayStats.newCars}}</view>
             <view class="stat-label">新增车辆</view>
           </view>
           <view class="stat-card">
-            <view class="stat-value" style="color: #e74c3c;">0</view>
-            <view class="stat-label">报废/删除</view>
+            <view class="stat-value" style="color: #636e72;">{{todayStats.totalCars}}</view>
+            <view class="stat-label">车辆总数</view>
           </view>
         </view>
       </view>
@@ -53,7 +53,7 @@
       <view class="chart-section">
         <view class="chart-title">本周订单</view>
         <view class="stat-card" style="text-align: left;">
-          <view class="stat-value" style="font-size: 72rpx;">248</view>
+          <view class="stat-value" style="font-size: 72rpx;">{{weekStats.totalOrders}}</view>
           <view class="stat-label">本周累计订单</view>
         </view>
       </view>
@@ -70,15 +70,11 @@
       </view>
 
       <view class="chart-section">
-        <view class="chart-title">本周车辆变化</view>
+        <view class="chart-title">本周概况</view>
         <view class="stats-grid">
           <view class="stat-card">
-            <view class="stat-value" style="color: #00b894;">+5</view>
+            <view class="stat-value" style="color: #00b894;">+{{weekStats.newCars}}</view>
             <view class="stat-label">新增车辆</view>
-          </view>
-          <view class="stat-card">
-            <view class="stat-value" style="color: #e74c3c;">-2</view>
-            <view class="stat-label">报废/删除</view>
           </view>
         </view>
       </view>
@@ -89,7 +85,7 @@
       <view class="chart-section">
         <view class="chart-title">本月订单</view>
         <view class="stat-card" style="text-align: left;">
-          <view class="stat-value" style="font-size: 72rpx;">1,286</view>
+          <view class="stat-value" style="font-size: 72rpx;">{{monthStats.totalOrders}}</view>
           <view class="stat-label">本月累计订单</view>
         </view>
       </view>
@@ -106,40 +102,20 @@
       </view>
 
       <view class="chart-section">
-        <view class="chart-title">本月车辆变化</view>
+        <view class="chart-title">本月概况</view>
         <view class="stats-grid">
           <view class="stat-card">
-            <view class="stat-value" style="color: #00b894;">+15</view>
+            <view class="stat-value" style="color: #00b894;">+{{monthStats.newCars}}</view>
             <view class="stat-label">新增车辆</view>
-          </view>
-          <view class="stat-card">
-            <view class="stat-value" style="color: #e74c3c;">-3</view>
-            <view class="stat-label">报废/删除</view>
           </view>
         </view>
       </view>
 
-      <view class="chart-section">
+      <view class="chart-section" wx:if="{{topCars.length > 0}}">
         <view class="chart-title">热门车型 TOP5</view>
-        <view class="list-item">
-          <text class="item-name">雅迪DT3</text>
-          <text class="item-count">286次</text>
-        </view>
-        <view class="list-item">
-          <text class="item-name">爱玛晴天</text>
-          <text class="item-count">234次</text>
-        </view>
-        <view class="list-item">
-          <text class="item-name">台铃萌彩</text>
-          <text class="item-count">198次</text>
-        </view>
-        <view class="list-item">
-          <text class="item-name">新日小宇宙</text>
-          <text class="item-count">165次</text>
-        </view>
-        <view class="list-item">
-          <text class="item-name">小牛MQi2</text>
-          <text class="item-count">142次</text>
+        <view class="list-item" wx:for="{{topCars}}" wx:key="index">
+          <text class="item-name">{{item.name}}</text>
+          <text class="item-count">{{item.count}}次</text>
         </view>
       </view>
     </view>

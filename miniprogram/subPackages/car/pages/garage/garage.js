@@ -10,10 +10,28 @@ Page({
       1: '租聘中',
       2: '待结算'
     },
-    vehicles: []
+    vehicles: [],
+    selectMode: '',  // '' | 'rental' | 'settle' | 'renew'
+    selectHint: ''
   },
 
-  onLoad() {
+  onLoad(options) {
+    // 处理从首页跳转过来的场景
+    if (options.action) {
+      const actionMap = {
+        rental: { mode: 'rental', hint: '请选择要租聘的车辆' },
+        settle: { mode: 'settle', hint: '请选择要结算的车辆' },
+        renew: { mode: 'renew', hint: '请选择要续租的车辆' }
+      }
+      const config = actionMap[options.action]
+      if (config) {
+        this.setData({
+          selectMode: config.mode,
+          selectHint: config.hint
+        })
+        wx.setNavigationBarTitle({ title: '选择车辆' })
+      }
+    }
     this.loadVehicles()
   },
 
@@ -27,7 +45,8 @@ Page({
     const db = wx.cloud.database()
     db.collection('car')
       .where({
-        is_delete: false
+        is_delete: false,
+        create_by: app.globalData.openId
       })
       .get({
         success: (res) => {
@@ -96,6 +115,32 @@ Page({
     })
   },
 
+  // 选择车辆（选择模式下）
+  selectVehicle(e) {
+    const id = e.currentTarget.dataset.id
+    const status = parseInt(e.currentTarget.dataset.status)
+    const { selectMode } = this.data
+
+    // 根据选择模式和车辆状态判断是否可以操作
+    if (selectMode === 'rental' && status !== 0) {
+      wx.showToast({ title: '只能选择空闲的车辆', icon: 'none' })
+      return
+    }
+    if ((selectMode === 'settle' || selectMode === 'renew') && status === 0) {
+      wx.showToast({ title: '该车辆未在租聘中', icon: 'none' })
+      return
+    }
+
+    // 跳转到对应页面
+    if (selectMode === 'rental') {
+      wx.navigateTo({ url: `/subPackages/order/pages/rental/rental?id=${id}` })
+    } else if (selectMode === 'settle') {
+      wx.navigateTo({ url: `/subPackages/order/pages/settle/settle?id=${id}` })
+    } else if (selectMode === 'renew') {
+      wx.navigateTo({ url: `/subPackages/order/pages/renew/renew?id=${id}` })
+    }
+  },
+
   // 跳转到编辑
   goToEdit(e) {
     const id = e.currentTarget.dataset.id
@@ -107,13 +152,20 @@ Page({
   // 删除车辆
   deleteVehicle(e) {
     const id = e.currentTarget.dataset.id
+    const vehicle = this.data.vehicles.find(v => v._id == id)
+
+    // 权限校验
+    if (!vehicle || vehicle.create_by !== app.globalData.openId) {
+      wx.showToast({ title: '无权删除此车辆', icon: 'none' })
+      return
+    }
+
     wx.showModal({
       title: '确认删除',
       content: '确定要删除该车辆吗？相关订单也将被删除！',
       confirmColor: '#e74c3c',
       success: (res) => {
         if (res.confirm) {
-          const vehicle = this.data.vehicles.find(v => v._id == id)
           if (vehicle) {
             // 删除云存储中的图片
             const filesToDelete = []
@@ -140,9 +192,17 @@ Page({
             const db = wx.cloud.database()
             db.collection('car').doc(id).update({
               data: {
-                is_delete: 1
+                is_delete: true
               },
               success: () => {
+                // 写入操作日志
+                app.addOperationLog({
+                  collection: 'car',
+                  record_id: id,
+                  action: 'delete',
+                  car_id: id,
+                  remark: '删除车辆'
+                })
                 console.log('云数据库记录已更新为删除')
               },
               fail: (err) => {

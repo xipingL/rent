@@ -59,15 +59,17 @@ Page({
   async loadOrders() {
     wx.showLoading({ title: '加载中...' })
 
+    const app = getApp()
     const db = wx.cloud.database()
 
     try {
-      // 获取首次租聘订单 (type = 0, status != 2, is_delete = false)
+      // 获取当前用户首次租聘订单 (type = 0, status != 2, is_delete = false)
       const rentalRes = await db.collection('rental')
         .where({
           type: 0,
           status: db.command.neq(2),
-          is_delete: false
+          is_delete: false,
+          create_by: app.globalData.openId
         })
         .orderBy('expireTime', 'asc')
         .get()
@@ -88,11 +90,12 @@ Page({
         return
       }
 
-      // 查询所有相关车辆信息
+      // 查询所有相关车辆信息（同样需要 create_by 过滤）
       const carRes = await db.collection('car')
         .where({
           _id: db.command.in(carIds),
-          is_delete: false
+          is_delete: false,
+          create_by: app.globalData.openId
         })
         .get()
 

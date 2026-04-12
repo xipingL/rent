@@ -1,4 +1,6 @@
 // pages/settle/settle.js
+const app = getApp()
+
 Page({
   data: {
     loading: true,
@@ -31,12 +33,22 @@ Page({
           return
         }
         const vehicle = carRes.data[0]
-        // 获取该车辆所有生效中的租聘记录
+
+        // 权限校验：只有创建人可以操作
+        if (vehicle.create_by !== app.globalData.openId) {
+          wx.hideLoading()
+          wx.showToast({ title: '无权操作此车辆', icon: 'none' })
+          setTimeout(() => wx.navigateBack(), 1500)
+          return
+        }
+
+        // 获取该车辆所有生效中的租聘记录（只查询自己的）
         db.collection('rental')
           .where({
             carId: options.id,
             status: 0,
-            is_delete: false
+            is_delete: false,
+            create_by: app.globalData.openId
           })
           .orderBy('createTime', 'asc')
           .get({
@@ -171,7 +183,7 @@ Page({
           })
         })
 
-        // 更新车辆状态为空闲
+        // 更新车辆状态为空闲（2 → 0）
         updatePromises.push(
           db.collection('car').doc(vehicle._id).update({
             data: { status: 0 }
@@ -181,6 +193,15 @@ Page({
         return Promise.all(updatePromises)
       })
       .then(() => {
+        // 写入操作日志
+        app.addOperationLog({
+          collection: 'rental',
+          record_id: rentals[0]._id,
+          action: 'settle',
+          car_id: vehicle._id,
+          remark: remark || '结算完成'
+        })
+
         wx.hideLoading()
         wx.showToast({ title: '结算成功', icon: 'success' })
         setTimeout(() => wx.navigateBack(), 1500)

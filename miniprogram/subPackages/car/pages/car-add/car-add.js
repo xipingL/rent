@@ -176,10 +176,20 @@ Page({
         photos: photosFileIDs,
         status: 0,
         is_delete: false,
+        create_by: app.globalData.openId,
         createTime: db.serverDate()
       },
       success: (res) => {
         wx.hideLoading()
+
+        // 写入操作日志
+        app.addOperationLog({
+          collection: 'car',
+          record_id: res._id,
+          action: 'create',
+          car_id: res._id,
+          remark: '新增车辆'
+        })
 
         // 更新本地数据
         const vehicles = app.globalData.vehicles || []

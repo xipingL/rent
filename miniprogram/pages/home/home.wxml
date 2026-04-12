@@ -9,8 +9,12 @@
     <!-- 统计卡片 -->
     <view class="stats-card">
       <view class="stat-item">
-        <view class="stat-number">{{rentalCount}}</view>
+        <view class="stat-number">{{stats.rentingCars}}</view>
         <view class="stat-label">在租车辆</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number">{{stats.idleCars}}</view>
+        <view class="stat-label">空闲车辆</view>
       </view>
       <view class="stat-item">
         <view class="stat-number">{{todayOrders}}</view>

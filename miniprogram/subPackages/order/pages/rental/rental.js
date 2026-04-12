@@ -57,6 +57,14 @@ Page({
           return
         }
 
+        // 权限校验：只有创建人可以操作租车
+        if (res.data.create_by !== app.globalData.openId) {
+          wx.showToast({ title: '无权操作此车辆', icon: 'none' })
+          this.setData({ loading: false })
+          setTimeout(() => wx.navigateBack(), 1500)
+          return
+        }
+
         if (res.data.status !== 0) {
           wx.showToast({ title: '该车辆不可租聘', icon: 'error' })
           this.setData({ loading: false })
@@ -329,18 +337,9 @@ Page({
     // 收集所有需要上传的临时文件
     const filesToUpload = [idCardFront, idCardBack, ...vehiclePhotos]
 
-    // 先获取 openid
-    wx.cloud.callFunction({
-      name: 'getOpenId',
-      success: (openIdRes) => {
-        const openid = openIdRes.result.openid
-        this.doSave(openid)
-      },
-      fail: (err) => {
-        console.error('获取openid失败', err)
-        this.doSave('')
-      }
-    })
+    // 使用全局 openId
+    const openid = app.globalData.openId || ''
+    this.doSave(openid)
   },
 
   doSave(openid) {
@@ -368,11 +367,21 @@ Page({
             status: 0,
             type: 0,
             is_delete: false,
+            create_by: app.globalData.openId,
             createTime: db.serverDate()
           },
           success: (res) => {
             db.collection('car').doc(vehicle._id).update({
               data: { status: 1 }
+            })
+
+            // 写入操作日志
+            app.addOperationLog({
+              collection: 'rental',
+              record_id: res._id,
+              action: 'rent',
+              car_id: vehicle._id,
+              remark: `${name}，${this.formatDateOnly(new Date(startTime))}至${this.formatDateOnly(new Date(expireTime))}`
             })
 
             wx.hideLoading()

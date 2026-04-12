@@ -47,12 +47,21 @@ Page({
         }
         const vehicle = carRes.data[0]
 
-        // 获取该车辆所有生效中的租聘记录
+        // 权限校验：只有创建人可以操作
+        if (vehicle.create_by !== app.globalData.openId) {
+          wx.hideLoading()
+          wx.showToast({ title: '无权操作此车辆', icon: 'none' })
+          setTimeout(() => wx.navigateBack(), 1500)
+          return
+        }
+
+        // 获取该车辆所有生效中的租聘记录（只查询自己的）
         db.collection('rental')
           .where({
             carId: options.id,
             status: 0,
-            is_delete: false
+            is_delete: false,
+            create_by: app.globalData.openId
           })
           .orderBy('createTime', 'asc')
           .get({
@@ -76,7 +85,8 @@ Page({
                 db.collection('rental')
                   .where({
                     carId: options.id,
-                    type: 1
+                    type: 1,
+                    create_by: app.globalData.openId
                   })
                   .count({
                     success: (countRes) => {
@@ -260,13 +270,23 @@ Page({
         parentRentalId: latestRental._id,
         startTime: latestRental.expireTime,
         duration: actualDuration,
-        expireTime: expireTime,
+        expireTime: new Date(expireTime),
         status: 0,
         type: 1,
         is_delete: false,
+        create_by: app.globalData.openId,
         createTime: db.serverDate()
       },
       success: (res) => {
+        // 写入操作日志
+        app.addOperationLog({
+          collection: 'rental',
+          record_id: res._id,
+          action: 'renew',
+          car_id: vehicle._id,
+          remark: `${latestRental.renterName}，续租${actualDuration}天，到期时间${expireTime}`
+        })
+
         wx.hideLoading()
         wx.showToast({ title: '续租成功', icon: 'success' })
         setTimeout(() => wx.navigateBack(), 1500)
