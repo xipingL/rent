@@ -18,7 +18,7 @@
 | note | string | 备注信息 |
 | image | string | 封面图片的云存储文件ID |
 | photos | array | 车辆照片的云存储文件ID列表 |
-| status | number | 车辆状态：0=空闲可租，1=租聘中 |
+| status | number | 车辆状态：0=空闲可租，1=租聘中，2=租聘结束待归还 |
 | is_delete | boolean | 是否删除：false=未删除，true=已删除 |
 | createTime | Date | 创建时间 |
 
@@ -32,13 +32,14 @@
 | carId | string | 关联的车辆ID |
 | renterName | string | 租车人姓名 |
 | renterPhone | string | 租车人手机号 |
+| renterOpenId | string | 租车人OpenID（用于发送订阅消息） |
 | idCardFront | string | 身份证正面照片的云存储文件ID |
 | idCardBack | string | 身份证反面照片的云存储文件ID |
 | vehiclePhotos | array | 车辆照片的云存储文件ID列表 |
-| startTime | string | 起租时间，格式："YYYY-MM-DD HH:mm" |
+| startTime | Date | 起租时间 |
 | duration | number | 租聘时长（天数） |
-| expireTime | string | 到期时间，格式："YYYY-MM-DD HH:mm" |
-| status | number | 订单状态：0=进行中，1=待结算，2=已完成 |
+| expireTime | Date | 到期时间 |
+| status | number | 订单状态：0=租聘中，1=待结算，2=已结算 |
 | type | number | 订单类型：0=首次租聘，1=续租 |
 | parentRentalId | string | 父订单ID（续租时关联首次租聘订单） |
 | settleTime | Date | 结算时间 |
@@ -54,6 +55,7 @@
 ### 车辆状态 (car.status)
 - `0` - 空闲可租
 - `1` - 租聘中
+- `2` - 租聘结束待归还
 
 ### 订单状态 (rental.status)
 - `0` - 进行中

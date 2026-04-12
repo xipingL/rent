@@ -6,20 +6,23 @@
   </view>
 
   <view class="search-bar">
+    <!-- 搜索行 -->
     <view class="search-row">
-      <text class="search-icon">🔍</text>
-      <input type="text" class="search-input" placeholder="搜索租车人、车牌、品牌..." bindinput="onSearchInput"></input>
+      <view class="search-input-wrapper">
+        <text class="search-icon">🔍</text>
+        <input type="text" class="search-input" placeholder="搜索租车人、车牌、品牌..." bindinput="onSearchInput"></input>
+      </view>
+      <button class="search-btn" bindtap="onSearch">搜索</button>
     </view>
-    <view class="search-row time-range">
-      <view class="date-picker-wrapper">
-        <view class="time-input">{{startTime || '开始日期'}}</view>
-        <picker mode="date" value="{{startTime}}" bindchange="onStartTimeChange"></picker>
-      </view>
-      <text class="time-label">至</text>
-      <view class="date-picker-wrapper">
-        <view class="time-input">{{endTime || '结束日期'}}</view>
-        <picker mode="date" value="{{endTime}}" bindchange="onEndTimeChange"></picker>
-      </view>
+    <!-- 日期筛选行 -->
+    <view class="date-row">
+      <picker mode="date" value="{{startTime}}" bindchange="onStartTimeChange" class="date-picker">
+        <view class="date-input">{{startTime || '起始时间'}}</view>
+      </picker>
+      <text class="date-separator">-</text>
+      <picker mode="date" value="{{endTime}}" bindchange="onEndTimeChange" class="date-picker">
+        <view class="date-input">{{endTime || '截止时间'}}</view>
+      </picker>
     </view>
   </view>
 
@@ -36,7 +39,7 @@
             </view>
           </view>
           <view class="order-status {{item.status === 0 ? 'status-renting' : (item.status === 1 ? 'status-pending' : 'status-completed')}}">
-            {{item.status === 0 ? '进行中' : (item.status === 1 ? '待结算' : '已完成')}}
+            {{item.status === 0 ? '租聘中' : (item.status === 1 ? '待结算' : '已结算')}}
           </view>
         </view>
         <view class="order-info">

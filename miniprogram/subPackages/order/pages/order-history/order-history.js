@@ -110,15 +110,27 @@ Page({
 
   // 开始时间变化
   onStartTimeChange(e) {
-    this.setData({
-      startTime: e.detail.value
-    })
+    const startTime = e.detail.value
+    const { endTime } = this.data
+
+    if (endTime && startTime > endTime) {
+      wx.showToast({ title: '起始时间不能晚于截止时间', icon: 'none' })
+      return
+    }
+
+    this.setData({ startTime })
   },
 
   // 结束时间变化
   onEndTimeChange(e) {
-    this.setData({
-      endTime: e.detail.value
-    })
+    const endTime = e.detail.value
+    const { startTime } = this.data
+
+    if (startTime && endTime < startTime) {
+      wx.showToast({ title: '截止时间不能早于起始时间', icon: 'none' })
+      return
+    }
+
+    this.setData({ endTime })
   }
 })

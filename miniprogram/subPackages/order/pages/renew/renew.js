@@ -176,7 +176,7 @@ Page({
     // 使用最新一条租聘记录的到期时间
     const latestRental = rentals[rentals.length - 1]
     const now = new Date()
-    const expireDate = new Date(latestRental.expireTime.replace(/-/g, '/'))
+    const expireDate = latestRental.expireTime instanceof Date ? latestRental.expireTime : new Date(latestRental.expireTime)
     const diff = expireDate - now
 
     let text = ''
@@ -220,7 +220,7 @@ Page({
 
     // 使用最新一条租聘记录的到期时间
     const latestRental = rentals[rentals.length - 1]
-    const expireDate = new Date(latestRental.expireTime.replace(/-/g, '/'))
+    const expireDate = latestRental.expireTime instanceof Date ? latestRental.expireTime : new Date(latestRental.expireTime)
     expireDate.setDate(expireDate.getDate() + actualDuration)
 
     const year = expireDate.getFullYear()

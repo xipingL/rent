@@ -1,0 +1,9 @@
+{
+  "triggers": [
+    {
+      "name": "checkExpired",
+      "type": "timer",
+      "config": "0 * * * * *"
+    }
+  ]
+}

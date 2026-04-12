@@ -164,7 +164,10 @@ Page({
     if (!expireTime) return '无'
 
     const now = new Date()
-    const expireDate = new Date(expireTime.replace(/-/g, '/'))
+    // expireTime 可能是 Date 对象或时间戳
+    const expireDate = expireTime instanceof Date
+      ? expireTime
+      : new Date(expireTime)
     const diff = expireDate - now
 
     if (diff < 0) {
