@@ -64,15 +64,17 @@ exports.main = async (event, context) => {
     await Promise.allSettled(expiredRentals.map(async rental => {
       if (!rental.renterOpenId) return
 
+      const plateNo = carMap[rental.carId] || '未知'
+
       try {
         await cloud.openapi.subscribeMessage.send({
           touser: rental.renterOpenId,
           templateId: 'Kpp_Cw-mOX28aKmWmvfcE-XCmi8YtkpU6_el84_4Ttc',
           page: 'pages/index/index',
           data: {
-            phrase1: { value: carMap[rental.carId] || '未知' },
-            date2: { value: formatTime(rental.startTime) },
-            date3: { value: formatTime(rental.expireTime) }
+            car_number2: { value: plateNo },
+            time3: { value: formatTime(rental.startTime) },
+            time6: { value: formatTime(rental.expireTime) }
           }
         })
         sentCount++

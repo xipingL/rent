@@ -71,7 +71,7 @@
 }
 
 .edit-btn {
-  font-size: 32rpx;
+  font-size: 24rpx;
   padding: 8rpx;
 }
 

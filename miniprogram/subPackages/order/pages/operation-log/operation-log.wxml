@@ -1,0 +1,32 @@
+<!--pages/operation-log/operation-log.wxml-->
+<view class="container">
+  <view class="header">
+    <view class="header-left">
+      <view class="back-btn" bindtap="goBack">←</view>
+      <view class="header-title">操作记录</view>
+    </view>
+  </view>
+
+  <scroll-view class="content" scroll-y>
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{logs.length === 0 && !loading}}">
+      <text class="empty-icon">📝</text>
+      <text class="empty-text">暂无操作记录</text>
+    </view>
+
+    <view class="log-list">
+      <view class="log-item" wx:for="{{logs}}" wx:key="_id">
+        <view class="log-header">
+          <text class="log-action action-{{item.action}}">{{actionText[item.action]}}</text>
+          <text class="log-time">{{item.createTimeStr}}</text>
+        </view>
+        <view class="log-detail">
+          <text class="log-remark">{{item.friendlyRemark}}</text>
+        </view>
+        <view class="log-meta">
+          <text class="log-collection">{{item.collection === 'car' ? '车辆操作' : '订单操作'}}</text>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>

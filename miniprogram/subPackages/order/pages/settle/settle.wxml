@@ -32,8 +32,8 @@
           <text class="rental-duration">{{item.duration}}天</text>
         </view>
         <view class="rental-dates">
-          <text>起租: {{item.startTime}}</text>
-          <text>到期: {{item.expireTime}}</text>
+          <text>起租: {{item.startTimeStr}}</text>
+          <text>到期: {{item.expireTimeStr}}</text>
         </view>
       </view>
     </view>

@@ -130,5 +130,10 @@ Page({
   // 跳转到历史订单
   goToHistory() {
     wx.navigateTo({ url: '/subPackages/order/pages/order-history/order-history' });
+  },
+
+  // 跳转到操作记录
+  goToOperationLog() {
+    wx.navigateTo({ url: '/subPackages/order/pages/operation-log/operation-log' });
   }
 });

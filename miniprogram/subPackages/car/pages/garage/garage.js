@@ -13,7 +13,8 @@ Page({
     vehicles: [],
     filteredVehicles: [],  // 过滤后的车辆列表
     selectMode: '',  // '' | 'rental' | 'settle' | 'renew'
-    selectHint: ''
+    selectHint: '',
+    loading: true
   },
 
   onLoad(options) {
@@ -45,6 +46,7 @@ Page({
   },
 
   loadVehicles() {
+    this.setData({ loading: true })
     wx.showLoading({ title: '加载中...' })
 
     const db = wx.cloud.database()
@@ -55,21 +57,60 @@ Page({
       })
       .get({
         success: (res) => {
-          wx.hideLoading()
-          const { selectMode } = this.data
-          const filteredVehicles = this.filterVehicles(res.data, selectMode)
-          this.setData({
-            vehicles: res.data,
-            filteredVehicles
+          const vehicles = res.data || []
+
+          // 获取图片临时链接
+          this.loadImageUrls(vehicles).then(formattedVehicles => {
+            wx.hideLoading()
+            const { selectMode } = this.data
+            const filteredVehicles = this.filterVehicles(formattedVehicles, selectMode)
+            this.setData({
+              vehicles: formattedVehicles,
+              filteredVehicles,
+              loading: false
+            })
+            app.globalData.vehicles = formattedVehicles
           })
-          app.globalData.vehicles = res.data
         },
         fail: (err) => {
           wx.hideLoading()
+          this.setData({ loading: false })
           console.error('获取车辆列表失败', err)
           wx.showToast({ title: '加载失败', icon: 'error' })
         }
       })
+  },
+
+  // 获取图片临时链接
+  loadImageUrls(vehicles) {
+    return new Promise((resolve) => {
+      const fileIDs = vehicles.map(v => v.image).filter(Boolean)
+      if (fileIDs.length === 0) {
+        resolve(vehicles)
+        return
+      }
+
+      wx.cloud.getTempFileURL({
+        fileList: fileIDs,
+        success: (res) => {
+          const urlMap = {}
+          res.fileList.forEach(f => {
+            urlMap[f.fileID] = f.tempFileURL
+          })
+          vehicles.forEach(v => {
+            v.imageUrl = urlMap[v.image] || v.image
+          })
+          resolve(vehicles)
+        },
+        fail: () => {
+          // 获取失败时使用原始fileID
+          vehicles.forEach(v => {
+            v.imageUrl = v.image
+          })
+          resolve(vehicles)
+        }
+      })
+    })
   },
 
   // 切换标签页

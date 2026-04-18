@@ -386,7 +386,7 @@ Page({
 
             wx.hideLoading()
             wx.showToast({ title: '租聘成功', icon: 'success' })
-            setTimeout(() => wx.redirectTo({ url: '/pages/home/home' }), 1500)
+            setTimeout(() => wx.redirectTo({ url: '/subPackages/car/pages/garage/garage' }), 1500)
           },
           fail: (err) => {
             wx.hideLoading()
@@ -397,8 +397,8 @@ Page({
       })
       .catch((err) => {
         wx.hideLoading()
-        console.error('租聘保存失败：', err)
-        wx.showToast({ title: '图片检查失败', icon: 'error' })
+        console.error('图片上传失败：', err)
+        wx.showToast({ title: '图片上传失败', icon: 'error' })
       })
   }
 })

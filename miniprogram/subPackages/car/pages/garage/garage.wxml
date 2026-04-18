@@ -24,10 +24,15 @@
 
   <!-- 内容区 -->
   <scroll-view class="content" scroll-y>
+    <!-- 空状态（加载完成后且列表为空才显示） -->
+    <view class="empty-state" wx:if="{{!loading && filteredVehicles.length === 0}}">
+      <image class="empty-image" src="/images/empty-car.png" mode="aspectFit"></image>
+    </view>
+
     <block wx:for="{{filteredVehicles}}" wx:key="_id">
       <view class="vehicle-card" bindtap="{{selectMode ? 'selectVehicle' : 'goToDetail'}}" data-id="{{item._id}}" data-status="{{item.status}}">
         <view class="vehicle-image">
-          <image class="vehicle-img" src="{{item.image}}"></image>
+          <image class="vehicle-img" src="{{item.imageUrl || item.image}}"></image>
           <view class="vehicle-status status-{{item.status}}">{{statusText[item.status]}}</view>
         </view>
         <view class="vehicle-info">

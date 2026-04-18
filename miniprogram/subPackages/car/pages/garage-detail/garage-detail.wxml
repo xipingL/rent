@@ -77,7 +77,11 @@
             <text class="date-label">起租时间</text>
             <text class="date-value">{{item.startTimeStr}}</text>
           </view>
-          <view>
+          <view wx:if="{{item.status === 2}}">
+            <text class="date-label">结算时间</text>
+            <text class="date-value">{{item.settleTimeStr}}</text>
+          </view>
+          <view wx:else>
             <text class="date-label">到期时间</text>
             <text class="date-value">{{item.expireTimeStr}}</text>
           </view>

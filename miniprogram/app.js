@@ -21,18 +21,26 @@ App({
 
     // 获取用户 openId
     this.getOpenId();
-
-    // 初始化用户信息
-    this.initUser();
   },
 
-  // 获取用户 openId
+  // 获取用户 openId（通过云函数）
   getOpenId() {
-    const wxContext = wx.cloud.getWXContext();
-    this.globalData.openId = wxContext.OPENID || null;
-    if (this.globalData.openId) {
-      console.log('用户 openId:', this.globalData.openId);
-    }
+    wx.showLoading({ title: '初始化...' });
+    wx.cloud.callFunction({
+      name: 'getOpenId',
+      success: (res) => {
+        wx.hideLoading();
+        console.log('获取 openId 成功:', res.result.openId);
+        this.globalData.openId = res.result.openId;
+        // openId 获取成功后，初始化用户信息
+        this.initUser();
+      },
+      fail: (err) => {
+        wx.hideLoading();
+        console.error('获取 openId 失败:', err);
+        wx.showToast({ title: '获取用户信息失败', icon: 'none' });
+      }
+    });
   },
 
   // 初始化用户信息（检查/创建）

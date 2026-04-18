@@ -10,6 +10,18 @@ Page({
     remark: ''
   },
 
+  // 格式化日期
+  formatDate(date) {
+    if (!date) return ''
+    const d = new Date(date)
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    const hour = String(d.getHours()).padStart(2, '0')
+    const minute = String(d.getMinutes()).padStart(2, '0')
+    return `${year}-${month}-${day} ${hour}:${minute}`
+  },
+
   onLoad(options) {
     if (!options.id) {
       wx.showToast({ title: '异常数据', icon: 'error' })
@@ -54,6 +66,12 @@ Page({
           .get({
             success: (rentalRes) => {
               const rentals = rentalRes.data || []
+
+              // 格式化日期
+              rentals.forEach(r => {
+                r.startTimeStr = this.formatDate(r.startTime)
+                r.expireTimeStr = this.formatDate(r.expireTime)
+              })
 
               // 获取首次租聘的车辆照片临时URL
               if (rentals.length > 0 && rentals[0].vehiclePhotos && rentals[0].vehiclePhotos.length > 0) {
@@ -199,12 +217,12 @@ Page({
           record_id: rentals[0]._id,
           action: 'settle',
           car_id: vehicle._id,
-          remark: remark || '结算完成'
+          remark: `${rentals[0].renterName}，${vehicle.name}[${vehicle.plateNo}]，已归还`
         })
 
         wx.hideLoading()
         wx.showToast({ title: '结算成功', icon: 'success' })
-        setTimeout(() => wx.redirectTo({ url: '/pages/home/home' }), 1500)
+        setTimeout(() => wx.redirectTo({ url: '/subPackages/car/pages/garage/garage' }), 1500)
       })
       .catch((err) => {
         wx.hideLoading()

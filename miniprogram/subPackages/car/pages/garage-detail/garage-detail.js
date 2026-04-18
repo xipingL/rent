@@ -9,6 +9,18 @@ Page({
     canOperate: false  // 是否有操作权限
   },
 
+  // 格式化日期
+  formatDate(date) {
+    if (!date) return ''
+    const d = new Date(date)
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    const hour = String(d.getHours()).padStart(2, '0')
+    const minute = String(d.getMinutes()).padStart(2, '0')
+    return `${year}-${month}-${day} ${hour}:${minute}`
+  },
+
   onLoad(options) {
     if (!options.id) {
       wx.showToast({ title: '异常数据', icon: 'error' })
@@ -83,11 +95,20 @@ Page({
           .get({
             success: async (rentalRes) => {
               const vehicleWithPhotos = await processPhotos(vehicle)
-              wx.hideLoading(rentalRes.data)
+
+              // 格式化日期
+              const rentalHistory = (rentalRes.data || []).map(r => ({
+                ...r,
+                startTimeStr: this.formatDate(r.startTime),
+                expireTimeStr: this.formatDate(r.expireTime),
+                settleTimeStr: r.settleTime ? this.formatDate(r.settleTime) : ''
+              }))
+
+              wx.hideLoading()
               this.setData({
                 loading: false,
                 vehicle: vehicleWithPhotos,
-                rentalHistory: rentalRes.data || []
+                rentalHistory
               })
             },
             fail: (err) => {
