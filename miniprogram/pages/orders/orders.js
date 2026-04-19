@@ -21,7 +21,6 @@ Page({
     if (typeof this.getTabBar === 'function') {
       this.getTabBar().setData({ active: 1 });
     }
-    this.loadOrders()
   },
 
   onUnload() {
@@ -47,17 +46,29 @@ Page({
 
     const updateOrders = (orders) => {
       return orders.map(order => {
-        return {
-          ...order,
-          remainingText: this.calculateRemaining(order.expireTime)
+        const newText = this.calculateRemaining(order.expireTime)
+        if (order.remainingText !== newText) {
+          // 只有文本变化时才创建新对象并更新
+          return { ...order, remainingText: newText }
         }
+        // 文本没变化，返回原对象，不触发重渲染
+        return order
       })
     }
 
-    this.setData({
-      status0Orders: updateOrders(status0Orders),
-      status1Orders: updateOrders(status1Orders)
-    })
+    const newStatus0Orders = updateOrders(status0Orders)
+    const newStatus1Orders = updateOrders(status1Orders)
+
+    // 检查是否有变化
+    const hasChanged = newStatus0Orders.some((o, i) => o !== status0Orders[i]) ||
+                       newStatus1Orders.some((o, i) => o !== status1Orders[i])
+
+    if (hasChanged) {
+      this.setData({
+        status0Orders: newStatus0Orders,
+        status1Orders: newStatus1Orders
+      })
+    }
   },
 
   async loadOrders() {
@@ -102,8 +113,6 @@ Page({
           create_by: app.globalData.openId
         })
         .get()
-
-      wx.hideLoading()
 
       const carMap = {}
       carRes.data.forEach(car => {
@@ -152,6 +161,7 @@ Page({
         }
       })
 
+      wx.hideLoading()
       this.setData({
         loading: false,
         orders: orders,

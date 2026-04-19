@@ -66,7 +66,7 @@
       <view class="chart-section">
         <view class="chart-title">近7天订单趋势</view>
         <view class="line-chart">
-          <canvas type="2d" id="weekChart" class="chart-canvas" bindtap="tapWeekChart"></canvas>
+          <canvas type="2d" id="weekChart" class="chart-canvas" bindtap="tapWeekChart" wx:if="{{currentTab === 'week'}}"></canvas>
         </view>
         <view class="chart-tooltip" wx:if="{{weekTooltip.show}}" style="left: {{weekTooltip.x}}px; top: {{weekTooltip.y}}px;">
           <text class="tooltip-label">{{weekTooltip.label}}</text>
@@ -98,7 +98,7 @@
       <view class="chart-section">
         <view class="chart-title">近30天订单趋势</view>
         <view class="line-chart">
-          <canvas type="2d" id="monthChart" class="chart-canvas" bindtap="tapMonthChart"></canvas>
+          <canvas type="2d" id="monthChart" class="chart-canvas" bindtap="tapMonthChart" wx:if="{{currentTab === 'month'}}"></canvas>
         </view>
         <view class="chart-tooltip" wx:if="{{monthTooltip.show}}" style="left: {{monthTooltip.x}}px; top: {{monthTooltip.y}}px;">
           <text class="tooltip-label">{{monthTooltip.label}}</text>

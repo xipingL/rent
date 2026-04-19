@@ -37,11 +37,13 @@ Page({
     wx.navigateBack()
   },
 
-  // 操作类型选择
+  // 操作类型选择（自动筛选）
   onActionChange(e) {
     const index = e.detail.value
     const action = this.data.actionOptions[index]
-    this.setData({ selectedAction: action })
+    this.setData({ selectedAction: action }, () => {
+      this.onSearch()
+    })
   },
 
   // 搜索输入
@@ -49,7 +51,7 @@ Page({
     this.setData({ searchText: e.detail.value })
   },
 
-  // 开始时间变化
+  // 开始时间变化（自动筛选）
   onStartTimeChange(e) {
     const startTime = e.detail.value
     const { endTime } = this.data
@@ -57,10 +59,12 @@ Page({
       wx.showToast({ title: '起始时间不能晚于截止时间', icon: 'none' })
       return
     }
-    this.setData({ startTime })
+    this.setData({ startTime }, () => {
+      this.onSearch()
+    })
   },
 
-  // 结束时间变化
+  // 结束时间变化（自动筛选）
   onEndTimeChange(e) {
     const endTime = e.detail.value
     const { startTime } = this.data
@@ -68,7 +72,9 @@ Page({
       wx.showToast({ title: '截止时间不能早于起始时间', icon: 'none' })
       return
     }
-    this.setData({ endTime })
+    this.setData({ endTime }, () => {
+      this.onSearch()
+    })
   },
 
   // 搜索

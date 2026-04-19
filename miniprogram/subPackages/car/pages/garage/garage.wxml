@@ -26,7 +26,7 @@
   <scroll-view class="content" scroll-y>
     <!-- 空状态（加载完成后且列表为空才显示） -->
     <view class="empty-state" wx:if="{{!loading && filteredVehicles.length === 0}}">
-      <image class="empty-image" src="/images/empty-car.png" mode="aspectFit"></image>
+      <image class="empty-image" src="{{currentTab === 0 ? '/images/empty-car.png' : '/images/empty-car-notfont.png'}}" mode="aspectFit"></image>
     </view>
 
     <block wx:for="{{filteredVehicles}}" wx:key="_id">

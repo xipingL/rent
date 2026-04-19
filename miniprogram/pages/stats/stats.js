@@ -172,9 +172,6 @@ Page({
         },
         weekChartData: data,
         weekChartLabels: labels
-      }, () => {
-        // setData 完成后绘制图表
-        this.drawWeekChart()
       })
 
     } catch (e) {
@@ -267,9 +264,6 @@ Page({
         },
         monthChartData: data,
         topCars
-      }, () => {
-        // setData 完成后绘制图表
-        this.drawMonthChart()
       })
 
     } catch (e) {
