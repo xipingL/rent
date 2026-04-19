@@ -7,15 +7,41 @@
     </view>
   </view>
 
+  <!-- 搜索筛选栏 -->
+  <view class="search-bar">
+    <view class="search-row">
+      <!-- 操作类型选择 -->
+      <picker mode="selector" range="{{actionOptions}}" range-key="label" bindchange="onActionChange" class="filter-picker">
+        <view class="picker-value">{{selectedAction.label || '全部操作'}}</view>
+      </picker>
+      <!-- 搜索输入 -->
+      <view class="search-input-wrapper">
+        <text class="search-icon">🔍</text>
+        <input type="text" class="search-input" placeholder="搜索备注信息" bindinput="onSearchInput" value="{{searchText}}"/>
+      </view>
+      <!-- 搜索按钮 -->
+      <button class="search-btn" bindtap="onSearch">搜索</button>
+    </view>
+    <view class="date-row">
+      <picker mode="date" value="{{startTime}}" bindchange="onStartTimeChange" class="date-picker">
+        <view class="date-input">{{startTime || '起始时间'}}</view>
+      </picker>
+      <text class="date-separator">至</text>
+      <picker mode="date" value="{{endTime}}" bindchange="onEndTimeChange" class="date-picker">
+        <view class="date-input">{{endTime || '截止时间'}}</view>
+      </picker>
+    </view>
+  </view>
+
   <scroll-view class="content" scroll-y>
     <!-- 空状态 -->
-    <view class="empty-state" wx:if="{{logs.length === 0 && !loading}}">
+    <view class="empty-state" wx:if="{{filteredLogs.length === 0 && !loading}}">
       <text class="empty-icon">📝</text>
       <text class="empty-text">暂无操作记录</text>
     </view>
 
     <view class="log-list">
-      <view class="log-item" wx:for="{{logs}}" wx:key="_id">
+      <view class="log-item" wx:for="{{filteredLogs}}" wx:key="_id">
         <view class="log-header">
           <text class="log-action action-{{item.action}}">{{actionText[item.action]}}</text>
           <text class="log-time">{{item.createTimeStr}}</text>

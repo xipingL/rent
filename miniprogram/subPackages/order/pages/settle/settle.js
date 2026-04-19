@@ -178,7 +178,7 @@ Page({
       return
     }
 
-    wx.showLoading({ title: '保存中...' })
+    wx.showLoading({ title: '提交中...' })
 
     // 上传结算照片
     const uploadPromises = settlePhotos.length > 0
@@ -212,17 +212,18 @@ Page({
       })
       .then(() => {
         // 写入操作日志
-        app.addOperationLog({
+        return app.addOperationLog({
           collection: 'rental',
           record_id: rentals[0]._id,
           action: 'settle',
           car_id: vehicle._id,
           remark: `${rentals[0].renterName}，${vehicle.name}[${vehicle.plateNo}]，已归还`
         })
-
+      })
+      .then(() => {
+        // 所有操作完成，立即跳转
         wx.hideLoading()
-        wx.showToast({ title: '结算成功', icon: 'success' })
-        setTimeout(() => wx.redirectTo({ url: '/subPackages/car/pages/garage/garage' }), 1500)
+        wx.redirectTo({ url: '/subPackages/car/pages/garage/garage' })
       })
       .catch((err) => {
         wx.hideLoading()

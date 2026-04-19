@@ -70,7 +70,7 @@ exports.main = async (event, context) => {
         await cloud.openapi.subscribeMessage.send({
           touser: rental.renterOpenId,
           templateId: 'Kpp_Cw-mOX28aKmWmvfcE-XCmi8YtkpU6_el84_4Ttc',
-          page: 'pages/index/index',
+          page: 'pages/orders/orders?id=' + rental._id,
           data: {
             car_number2: { value: plateNo },
             time3: { value: formatTime(rental.startTime) },

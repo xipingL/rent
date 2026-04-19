@@ -5,10 +5,24 @@ Page({
   data: {
     loading: true,
     logs: [],
+    filteredLogs: [],
+    searchText: '',
+    startTime: '',
+    endTime: '',
+    selectedAction: { value: '', label: '全部操作' },
+    actionOptions: [
+      { value: '', label: '全部操作' },
+      { value: 'create', label: '创建车辆' },
+      { value: 'update', label: '编辑车辆' },
+      { value: 'delete', label: '删除车辆' },
+      { value: 'rent', label: '租车' },
+      { value: 'renew', label: '续租' },
+      { value: 'settle', label: '结算' }
+    ],
     actionText: {
       create: '创建车辆',
       update: '编辑车辆',
-      delete: '删除',
+      delete: '删除车辆',
       rent: '租车',
       renew: '续租',
       settle: '结算'
@@ -21,6 +35,84 @@ Page({
 
   goBack() {
     wx.navigateBack()
+  },
+
+  // 操作类型选择
+  onActionChange(e) {
+    const index = e.detail.value
+    const action = this.data.actionOptions[index]
+    this.setData({ selectedAction: action })
+  },
+
+  // 搜索输入
+  onSearchInput(e) {
+    this.setData({ searchText: e.detail.value })
+  },
+
+  // 开始时间变化
+  onStartTimeChange(e) {
+    const startTime = e.detail.value
+    const { endTime } = this.data
+    if (endTime && startTime > endTime) {
+      wx.showToast({ title: '起始时间不能晚于截止时间', icon: 'none' })
+      return
+    }
+    this.setData({ startTime })
+  },
+
+  // 结束时间变化
+  onEndTimeChange(e) {
+    const endTime = e.detail.value
+    const { startTime } = this.data
+    if (startTime && endTime < startTime) {
+      wx.showToast({ title: '截止时间不能早于起始时间', icon: 'none' })
+      return
+    }
+    this.setData({ endTime })
+  },
+
+  // 搜索
+  onSearch() {
+    const { logs, searchText, startTime, endTime, selectedAction } = this.data
+
+    let filtered = logs
+
+    // 按操作类型筛选
+    if (selectedAction.value) {
+      filtered = filtered.filter(log => log.action === selectedAction.value)
+    }
+
+    // 按搜索文本筛选（匹配备注信息）
+    if (searchText) {
+      const keyword = searchText.toLowerCase()
+      filtered = filtered.filter(log =>
+        (log.friendlyRemark && log.friendlyRemark.toLowerCase().includes(keyword)) ||
+        (log.remark && log.remark.toLowerCase().includes(keyword))
+      )
+    }
+
+    // 按时间范围筛选
+    if (startTime) {
+      const startDate = new Date(startTime)
+      startDate.setHours(0, 0, 0, 0)
+      filtered = filtered.filter(log => {
+        if (!log.createTime) return false
+        const logDate = new Date(log.createTime)
+        return logDate >= startDate
+      })
+    }
+
+    if (endTime) {
+      const endDate = new Date(endTime)
+      endDate.setHours(23, 59, 59, 999)
+      filtered = filtered.filter(log => {
+        if (!log.createTime) return false
+        const logDate = new Date(log.createTime)
+        return logDate <= endDate
+      })
+    }
+
+    this.setData({ filteredLogs: filtered })
   },
 
   // 格式化日期时间
@@ -144,7 +236,8 @@ Page({
 
       this.setData({
         loading: false,
-        logs: processedLogs
+        logs: processedLogs,
+        filteredLogs: processedLogs
       })
     } catch (err) {
       console.error('获取操作记录失败', err)

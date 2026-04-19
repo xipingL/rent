@@ -258,7 +258,7 @@ Page({
       return
     }
 
-    wx.showLoading({ title: '保存中...' })
+    wx.showLoading({ title: '提交中...' })
 
     // 使用最新一条租聘记录
     const latestRental = rentals[rentals.length - 1]
@@ -276,26 +276,25 @@ Page({
         is_delete: false,
         create_by: app.globalData.openId,
         createTime: db.serverDate()
-      },
-      success: (res) => {
-        // 写入操作日志
-        app.addOperationLog({
-          collection: 'rental',
-          record_id: res._id,
-          action: 'renew',
-          car_id: vehicle._id,
-          remark: `${latestRental.renterName}，续租${actualDuration}天，到期时间${expireTime}`
-        })
-
-        wx.hideLoading()
-        wx.showToast({ title: '续租成功', icon: 'success' })
-        setTimeout(() => wx.redirectTo({ url: '/subPackages/car/pages/garage/garage' }), 1500)
-      },
-      fail: (err) => {
-        wx.hideLoading()
-        console.error('续租失败', err)
-        wx.showToast({ title: '续租失败', icon: 'error' })
       }
+    }).then(res => {
+      // 写入操作日志
+      return app.addOperationLog({
+        collection: 'rental',
+        record_id: res._id,
+        action: 'renew',
+        car_id: vehicle._id,
+        remark: `${latestRental.renterName}，续租${actualDuration}天，到期时间${expireTime}`
+      }).then(() => res)
+    }).then(res => {
+      // 所有操作完成，立即跳转
+      wx.hideLoading()
+      wx.redirectTo({ url: '/subPackages/car/pages/garage/garage' })
+      return res
+    }).catch(err => {
+      wx.hideLoading()
+      console.error('续租失败', err)
+      wx.showToast({ title: '续租失败', icon: 'error' })
     })
   }
 })

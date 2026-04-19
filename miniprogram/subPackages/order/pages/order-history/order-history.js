@@ -14,31 +14,90 @@ Page({
   },
 
   // 加载订单数据
-  async loadOrders() {
+  async loadOrders(params = {}) {
     wx.showLoading({ title: '加载中...' })
 
     const db = wx.cloud.database()
+    const _ = db.command
 
     try {
+      let carIds = null
+
+      // 如果有搜索内容（车辆名称/牌照号），先查询匹配的车辆
+      if (params.searchText) {
+        const carRes = await db.collection('car')
+          .where({
+            create_by: app.globalData.openId,
+            is_delete: false,
+            $or: [
+              { name: db.RegExp({ regexp: params.searchText, options: 'i' }) },
+              { plateNo: db.RegExp({ regexp: params.searchText, options: 'i' }) }
+            ]
+          })
+          .get()
+
+        if (carRes.data && carRes.data.length > 0) {
+          carIds = carRes.data.map(car => car._id)
+        }
+      }
+
+      // 构建查询条件
+      const queryCondition = {
+        is_delete: false,
+        create_by: app.globalData.openId
+      }
+
+      // 如果有搜索内容，构建 $or 条件
+      if (params.searchText) {
+        const orConditions = []
+
+        // 租车人名称搜索（直接在 rental 表）
+        orConditions.push({
+          renterName: db.RegExp({ regexp: params.searchText, options: 'i' })
+        })
+
+        // 如果有匹配的车辆，添加车辆ID条件
+        if (carIds && carIds.length > 0) {
+          orConditions.push({ carId: _.in(carIds) })
+        }
+
+        if (orConditions.length > 0) {
+          queryCondition.$or = orConditions
+        }
+      }
+
+      // 如果有起始时间
+      if (params.startTime) {
+        const startDate = new Date(params.startTime)
+        startDate.setHours(0, 0, 0, 0)
+        queryCondition.startTime = _.gte(startDate)
+      }
+
+      // 如果有结束时间
+      if (params.endTime) {
+        const endDate = new Date(params.endTime)
+        endDate.setHours(23, 59, 59, 999)
+        queryCondition.startTime = queryCondition.startTime
+          ? _.and(queryCondition.startTime, _.lte(endDate))
+          : _.lte(endDate)
+      }
+
       // 获取当前用户未删除的订单
       const res = await db.collection('rental')
-        .where({
-          is_delete: false,
-          create_by: app.globalData.openId
-        })
+        .where(queryCondition)
         .orderBy('startTime', 'desc')
         .get()
 
       let orders = res.data || []
 
       // 收集所有 carId
-      const carIds = [...new Set(orders.map(order => order.carId))]
+      const orderCarIds = [...new Set(orders.map(order => order.carId))]
 
-      if (carIds.length > 0) {
-        // 查询相关车辆信息（同样需要过滤）
+      if (orderCarIds.length > 0) {
+        // 查询相关车辆信息
         const carRes = await db.collection('car')
           .where({
-            _id: db.command.in(carIds),
+            _id: _.in(orderCarIds),
             create_by: app.globalData.openId
           })
           .get()
@@ -69,6 +128,16 @@ Page({
           }
           if (order.expireTime) {
             order.expireTimeStr = this.formatDate(order.expireTime)
+          }
+          if (order.settleTime) {
+            order.settleTimeStr = this.formatDate(order.settleTime)
+          }
+          // 计算租期天数
+          if (order.startTime && order.expireTime) {
+            const start = new Date(order.startTime)
+            const end = order.settleTime ? new Date(order.settleTime) : new Date(order.expireTime)
+            const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24))
+            order.rentalDays = diff > 0 ? diff : 0
           }
           return order
         })
@@ -111,23 +180,8 @@ Page({
 
   // 搜索
   onSearch() {
-    const { searchText, orders } = this.data
-    if (!searchText) {
-      this.loadOrders()
-      return
-    }
-
-    // 按关键词筛选
-    const filtered = orders.filter(order => {
-      const keyword = searchText.toLowerCase()
-      return (
-        (order.name && order.name.toLowerCase().includes(keyword)) ||
-        (order.plateNo && order.plateNo.toLowerCase().includes(keyword)) ||
-        (order.renterName && order.renterName.toLowerCase().includes(keyword))
-      )
-    })
-
-    this.setData({ orders: filtered })
+    const { searchText, startTime, endTime } = this.data
+    this.loadOrders({ searchText, startTime, endTime })
   },
 
   // 开始时间变化
@@ -141,6 +195,7 @@ Page({
     }
 
     this.setData({ startTime })
+    this.loadOrders({ searchText: this.data.searchText, startTime, endTime })
   },
 
   // 结束时间变化
@@ -154,5 +209,6 @@ Page({
     }
 
     this.setData({ endTime })
+    this.loadOrders({ searchText: this.data.searchText, startTime, endTime })
   }
 })

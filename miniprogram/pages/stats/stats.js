@@ -3,6 +3,7 @@ const app = getApp()
 
 Page({
   data: {
+    loading: true,
     currentTab: 'today',
     todayStats: {
       totalCars: 0,
@@ -88,27 +89,21 @@ Page({
           pendingSettle: cars.filter(c => c.status === 2).length,
           newCars: todayCarsRes.total || 0,
           deletedCars: 0
-        },
-        weekStats: {
-          totalOrders: todayOrdersRes.total || 0,
-          newCars: todayCarsRes.total || 0,
-          deletedCars: 0
-        },
-        monthStats: {
-          totalOrders: todayOrdersRes.total || 0,
-          newCars: todayCarsRes.total || 0,
-          deletedCars: 0
         }
       })
 
       // 加载本周数据
-      this.loadWeekData()
+      await this.loadWeekData()
 
       // 加载本月数据
-      this.loadMonthData()
+      await this.loadMonthData()
+
+      // 所有数据加载完成
+      this.setData({ loading: false })
 
     } catch (e) {
       console.error('加载统计数据失败', e)
+      this.setData({ loading: false })
     }
   },
 
@@ -119,7 +114,8 @@ Page({
 
     // 计算本周一
     const weekStart = new Date(now)
-    weekStart.setDate(now.getDate() - now.getDay() + 1)
+    // 周日(getDay()=0)时往前推6天，其他日子减getDay()再加1
+    weekStart.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1))
     weekStart.setHours(0, 0, 0, 0)
 
     try {
@@ -133,6 +129,15 @@ Page({
         .get()
 
       const rentals = rentalRes.data || []
+
+      // 获取本周新增车辆数
+      const weekCarsRes = await db.collection('car')
+        .where({
+          is_delete: false,
+          create_by: app.globalData.openId,
+          createTime: db.command.gte(weekStart)
+        })
+        .count()
 
       // 按天统计
       const dayCount = {}
@@ -162,15 +167,13 @@ Page({
       this.setData({
         weekStats: {
           totalOrders: rentals.length,
-          newCars: 0,
+          newCars: weekCarsRes.total || 0,
           deletedCars: 0
         },
         weekChartData: data,
         weekChartLabels: labels
-      })
-
-      // 绘制图表
-      wx.nextTick(() => {
+      }, () => {
+        // setData 完成后绘制图表
         this.drawWeekChart()
       })
 
@@ -221,6 +224,15 @@ Page({
 
       this.monthData = data
 
+      // 获取本月新增车辆数
+      const monthCarsRes = await db.collection('car')
+        .where({
+          is_delete: false,
+          create_by: app.globalData.openId,
+          createTime: db.command.gte(monthStart)
+        })
+        .count()
+
       // 获取热门车型
       const carRes = await db.collection('car')
         .where({
@@ -250,15 +262,13 @@ Page({
       this.setData({
         monthStats: {
           totalOrders: rentals.length,
-          newCars: 0,
+          newCars: monthCarsRes.total || 0,
           deletedCars: 0
         },
         monthChartData: data,
         topCars
-      })
-
-      // 绘制图表
-      wx.nextTick(() => {
+      }, () => {
+        // setData 完成后绘制图表
         this.drawMonthChart()
       })
 
@@ -276,19 +286,15 @@ Page({
       currentTab: tab,
       weekTooltip: { show: false },
       monthTooltip: { show: false }
-    })
-
-    if (tab === 'week' && prevTab !== 'week') {
-      wx.nextTick(() => {
+    }, () => {
+      // setData 完成后绘制图表
+      if (tab === 'week' && prevTab !== 'week') {
         this.drawWeekChart()
-      })
-    }
-
-    if (tab === 'month' && prevTab !== 'month') {
-      wx.nextTick(() => {
+      }
+      if (tab === 'month' && prevTab !== 'month') {
         this.drawMonthChart()
-      })
-    }
+      }
+    })
   },
 
   // 点击本周图表
@@ -383,6 +389,8 @@ Page({
 
   // 绘制本周折线图
   async drawWeekChart() {
+    if (!this.weekLabels || !this.weekData) return
+
     const result = await this.getCanvasNode('weekChart')
     if (!result) return
 
@@ -482,6 +490,8 @@ Page({
 
   // 绘制本月折线图
   async drawMonthChart() {
+    if (!this.monthData) return
+
     const result = await this.getCanvasNode('monthChart')
     if (!result) return
 

@@ -182,6 +182,18 @@
   text-align: center;
 }
 
+.order-status-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8rpx;
+}
+
+.rental-days {
+  font-size: 22rpx;
+  color: #636e72;
+}
+
 .status-completed {
   background: #e8f8f5;
   color: #00b894;

@@ -319,7 +319,13 @@ Page({
       return
     }
 
-    // 请求订阅消息（不阻塞保存流程）
+    const { idCardFront, idCardBack, vehiclePhotos, vehicle, name, phone, startTime, duration, customDuration, expireTime } = this.data
+    const filesToUpload = [idCardFront, idCardBack, ...vehiclePhotos]
+    const openid = app.globalData.openId || ''
+
+    wx.showLoading({ title: '提交中...' })
+
+    // 请求订阅消息（等待用户响应后再继续）
     wx.requestSubscribeMessage({
       tmplIds: ['Kpp_Cw-mOX28aKmWmvfcE-XCmi8YtkpU6_el84_4Ttc'],
       success: (res) => {
@@ -328,23 +334,14 @@ Page({
       fail: (err) => {
         console.error('订阅消息请求失败', err)
       }
+    }).finally(() => {
+      // 无论订阅消息结果如何，都继续保存流程
+      this.doSave(openid, filesToUpload)
     })
-
-    wx.showLoading({ title: '保存中...' })
-
-    const { idCardFront, idCardBack, vehiclePhotos, vehicle, name, phone, startTime, duration, customDuration, expireTime } = this.data
-
-    // 收集所有需要上传的临时文件
-    const filesToUpload = [idCardFront, idCardBack, ...vehiclePhotos]
-
-    // 使用全局 openId
-    const openid = app.globalData.openId || ''
-    this.doSave(openid)
   },
 
-  doSave(openid) {
-    const { idCardFront, idCardBack, vehiclePhotos, vehicle, name, phone, startTime, duration, customDuration, expireTime } = this.data
-    const filesToUpload = [idCardFront, idCardBack, ...vehiclePhotos]
+  doSave(openid, filesToUpload) {
+    const { vehicle, name, phone, startTime, duration, customDuration, expireTime } = this.data
 
     Promise.all(filesToUpload.map(f => this.uploadFile(f)))
       .then((fileIDs) => {
@@ -352,7 +349,7 @@ Page({
         const actualDuration = duration === -1 ? parseInt(customDuration) : duration
 
         const db = wx.cloud.database()
-        db.collection('rental').add({
+        return db.collection('rental').add({
           data: {
             carId: vehicle._id,
             renterName: name,
@@ -369,13 +366,13 @@ Page({
             is_delete: false,
             create_by: app.globalData.openId,
             createTime: db.serverDate()
-          },
-          success: (res) => {
+          }
+        }).then(res => {
+          // 同时更新车辆状态和写入日志
+          return Promise.all([
             db.collection('car').doc(vehicle._id).update({
               data: { status: 1 }
-            })
-
-            // 写入操作日志
+            }),
             app.addOperationLog({
               collection: 'rental',
               record_id: res._id,
@@ -383,22 +380,18 @@ Page({
               car_id: vehicle._id,
               remark: `${name}，${this.formatDateOnly(new Date(startTime))}至${this.formatDateOnly(new Date(expireTime))}`
             })
-
-            wx.hideLoading()
-            wx.showToast({ title: '租聘成功', icon: 'success' })
-            setTimeout(() => wx.redirectTo({ url: '/subPackages/car/pages/garage/garage' }), 1500)
-          },
-          fail: (err) => {
-            wx.hideLoading()
-            console.error('保存租聘信息失败', err)
-            wx.showToast({ title: '保存失败，请重试', icon: 'error' })
-          }
+          ]).then(() => res)
+        }).then(res => {
+          // 所有操作完成，立即跳转
+          wx.hideLoading()
+          wx.redirectTo({ url: '/subPackages/car/pages/garage/garage' })
+          return res
         })
       })
       .catch((err) => {
         wx.hideLoading()
-        console.error('图片上传失败：', err)
-        wx.showToast({ title: '图片上传失败', icon: 'error' })
+        console.error('保存租聘信息失败', err)
+        wx.showToast({ title: '保存失败，请重试', icon: 'error' })
       })
   }
 })

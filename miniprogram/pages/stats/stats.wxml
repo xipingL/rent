@@ -13,6 +13,11 @@
   </view>
 
   <scroll-view class="content" scroll-y>
+    <!-- 加载中遮罩 -->
+    <view class="loading-mask" wx:if="{{loading}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
     <!-- 今日 -->
     <view class="tab-content" wx:if="{{currentTab === 'today'}}">
       <view class="chart-section">

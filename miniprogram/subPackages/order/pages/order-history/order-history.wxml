@@ -10,7 +10,7 @@
     <view class="search-row">
       <view class="search-input-wrapper">
         <text class="search-icon">🔍</text>
-        <input type="text" class="search-input" placeholder="搜索租车人、车牌、品牌..." bindinput="onSearchInput"></input>
+        <input type="text" class="search-input" placeholder="搜索车辆名称、车牌号、租车人" bindinput="onSearchInput"></input>
       </view>
       <button class="search-btn" bindtap="onSearch">搜索</button>
     </view>
@@ -38,8 +38,11 @@
               <view class="vehicle-plate">{{item.plateNo || '-'}}</view>
             </view>
           </view>
-          <view class="order-status {{item.status === 0 ? 'status-renting' : (item.status === 1 ? 'status-pending' : 'status-completed')}}">
-            {{item.status === 0 ? '租聘中' : (item.status === 1 ? '待结算' : '已结算')}}
+          <view class="order-status-wrapper">
+            <view class="order-status {{item.status === 0 ? 'status-renting' : (item.status === 1 ? 'status-pending' : 'status-completed')}}">
+              {{item.status === 0 ? '租聘中' : (item.status === 1 ? '待结算' : '已结算')}}
+            </view>
+            <view class="rental-days">租期 {{item.rentalDays || 0}}天</view>
           </view>
         </view>
         <view class="order-info">
@@ -49,8 +52,8 @@
               <text class="info-value">{{item.startTimeStr || '-'}}</text>
             </view>
             <view class="info-item end">
-              <text class="info-label">到期时间</text>
-              <text class="info-value">{{item.expireTimeStr || '-'}}</text>
+              <text class="info-label">{{item.status === 2 ? '结算时间' : '到期时间'}}</text>
+              <text class="info-value">{{item.status === 2 ? item.settleTimeStr : item.expireTimeStr}}</text>
             </view>
           </view>
         </view>

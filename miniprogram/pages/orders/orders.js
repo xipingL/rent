@@ -8,7 +8,11 @@ Page({
     timer: null
   },
 
-  onLoad() {
+  onLoad(options) {
+    // 处理订阅消息跳转带过来的订单 ID
+    if (options && options.id) {
+      this.highlightOrderId = options.id
+    }
     this.loadOrders()
     this.startTimer()
   },
@@ -153,6 +157,12 @@ Page({
         orders: orders,
         status0Orders: status0Orders,
         status1Orders: status1Orders
+      }, () => {
+        // 如果是从订阅消息点击进入，自动滚动到对应订单
+        if (this.highlightOrderId) {
+          this.scrollToOrder(this.highlightOrderId)
+          this.highlightOrderId = null // 清除，避免重复
+        }
       })
     } catch (err) {
       wx.hideLoading()
