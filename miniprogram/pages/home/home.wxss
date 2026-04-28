@@ -5,6 +5,18 @@
   background: #F5F6F7;
 }
 
+/* 加载中 */
+.loading-view {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F5F6F7;
+  color: #999;
+  font-size: 28rpx;
+}
+
 /* 头部区域 */
 .header {
   width: 100%;

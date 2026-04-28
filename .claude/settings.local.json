@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(cd:*)",
-      "Bash(find E:/rent/miniprogram/pages E:/rent/miniprogram/subPackages -name *.js -o -name *.wxml -o -name *.json -o -name *.wxss)"
+      "Bash(find E:/rent/miniprogram/pages E:/rent/miniprogram/subPackages -name *.js -o -name *.wxml -o -name *.json -o -name *.wxss)",
+      "Bash(sed:*)"
     ]
   }
 }

@@ -192,61 +192,6 @@ Page({
     })
   },
 
-  // 标记车辆为租出（状态 0 → 1）
-  markAsRented() {
-    const { vehicle } = this.data
-    if (!vehicle) return
-
-    // 权限校验
-    if (vehicle.create_by !== app.globalData.openId) {
-      wx.showToast({ title: '无权操作', icon: 'none' })
-      return
-    }
-
-    // 状态校验：只有空闲状态可以标记为租出
-    if (vehicle.status !== 0) {
-      wx.showToast({ title: '当前状态无法标记为租出', icon: 'none' })
-      return
-    }
-
-    wx.showModal({
-      title: '确认租出',
-      content: '确认将此车辆标记为已租出？',
-      success: (res) => {
-        if (res.confirm) {
-          wx.showLoading({ title: '处理中...' })
-          const db = wx.cloud.database()
-          db.collection('car').doc(vehicle._id).update({
-            data: {
-              status: 1
-            },
-            success: () => {
-              // 写入操作日志
-              app.addOperationLog({
-                collection: 'car',
-                record_id: vehicle._id,
-                action: 'update',
-                car_id: vehicle._id,
-                remark: '车辆租出'
-              })
-
-              wx.hideLoading()
-              wx.showToast({ title: '操作成功', icon: 'success' })
-
-              // 刷新数据
-              this.loadData(vehicle._id)
-            },
-            fail: (err) => {
-              wx.hideLoading()
-              console.error('操作失败', err)
-              wx.showToast({ title: '操作失败', icon: 'error' })
-            }
-          })
-        }
-      }
-    })
-  },
-
   // 获取状态文字
   getStatusText(status) {
     const statusMap = {

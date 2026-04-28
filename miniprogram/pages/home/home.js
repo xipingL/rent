@@ -3,6 +3,7 @@ const app = getApp()
 
 Page({
   data: {
+    loading: true,
     rentalCount: 0,
     todayOrders: 0,
     stats: {
@@ -13,11 +14,11 @@ Page({
     }
   },
 
-  onLoad() {
-    this.loadStats();
-  },
-
   onShow() {
+    // 等 openId 准备好再查
+    if (!app.globalData.openId) {
+      return setTimeout(() => this.onShow(), 500)
+    }
     this.loadStats();
     if (typeof this.getTabBar === 'function') {
       this.getTabBar().setData({ active: 0 });
@@ -27,7 +28,6 @@ Page({
   // 加载统计数据
   async loadStats() {
     const db = wx.cloud.database()
-
     try {
       // 查询当前用户的车辆
       const carRes = await db.collection('car')
@@ -36,7 +36,6 @@ Page({
           create_by: app.globalData.openId
         })
         .get()
-
       const cars = carRes.data || []
       const totalCars = cars.length
       const rentingCars = cars.filter(c => c.status === 1).length
@@ -58,6 +57,7 @@ Page({
         .count()
 
       this.setData({
+        loading: false,
         stats: {
           totalCars,
           rentingCars,
@@ -70,6 +70,7 @@ Page({
     } catch (e) {
       console.error('加载统计数据失败', e)
       this.setData({
+        loading: false,
         rentalCount: 0,
         todayOrders: 0
       })

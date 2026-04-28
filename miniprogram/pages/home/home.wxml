@@ -1,7 +1,12 @@
 <!--pages/home/home.wxml-->
 <view class="container">
+  <!-- 加载中 -->
+  <view class="loading-view" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
   <!-- 头部区域 -->
-  <view class="header">
+  <view class="header" wx:else>
     <view class="header-top">
       <view class="header-title">YeaRent</view>
       <view class="header-subtitle">商家电瓶车租聘管理平台</view>

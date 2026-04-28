@@ -55,11 +55,11 @@ Page({
           return
         }
 
-        // 获取该车辆所有生效中的租聘记录（只查询自己的）
+        // 获取该车辆所有生效中或待结算的租聘记录（只查询自己的）
         db.collection('rental')
           .where({
             carId: options.id,
-            status: 0,
+            status: db.command.in([0, 1]),
             is_delete: false,
             create_by: app.globalData.openId
           })

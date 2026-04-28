@@ -6,7 +6,6 @@
       <view class="header-title">车辆详情</view>
     </view>
     <view class="header-actions">
-      <view class="action-btn rent-btn" wx:if="{{canOperate && vehicle.status === 0}}" bindtap="markAsRented">租出</view>
       <view class="action-icon" bindtap="goToEdit" wx:if="{{canOperate}}">✏️</view>
       <view class="action-icon" bindtap="deleteVehicle" wx:if="{{canOperate}}">🗑️</view>
     </view>
