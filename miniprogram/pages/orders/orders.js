@@ -8,7 +8,11 @@ Page({
     timer: null
   },
 
-  onLoad() {
+  onLoad(options) {
+    // 处理订阅消息跳转带过来的订单 ID
+    if (options && options.id) {
+      this.highlightOrderId = options.id
+    }
     this.loadOrders()
     this.startTimer()
   },
@@ -17,7 +21,6 @@ Page({
     if (typeof this.getTabBar === 'function') {
       this.getTabBar().setData({ active: 1 });
     }
-    this.loadOrders()
   },
 
   onUnload() {
@@ -43,31 +46,45 @@ Page({
 
     const updateOrders = (orders) => {
       return orders.map(order => {
-        return {
-          ...order,
-          remainingText: this.calculateRemaining(order.expireTime)
+        const newText = this.calculateRemaining(order.expireTime)
+        if (order.remainingText !== newText) {
+          // 只有文本变化时才创建新对象并更新
+          return { ...order, remainingText: newText }
         }
+        // 文本没变化，返回原对象，不触发重渲染
+        return order
       })
     }
 
-    this.setData({
-      status0Orders: updateOrders(status0Orders),
-      status1Orders: updateOrders(status1Orders)
-    })
+    const newStatus0Orders = updateOrders(status0Orders)
+    const newStatus1Orders = updateOrders(status1Orders)
+
+    // 检查是否有变化
+    const hasChanged = newStatus0Orders.some((o, i) => o !== status0Orders[i]) ||
+                       newStatus1Orders.some((o, i) => o !== status1Orders[i])
+
+    if (hasChanged) {
+      this.setData({
+        status0Orders: newStatus0Orders,
+        status1Orders: newStatus1Orders
+      })
+    }
   },
 
   async loadOrders() {
     wx.showLoading({ title: '加载中...' })
 
+    const app = getApp()
     const db = wx.cloud.database()
 
     try {
-      // 获取首次租聘订单 (type = 0, status != 2, is_delete = false)
+      // 获取当前用户首次租聘订单 (type = 0, status != 2, is_delete = false)
       const rentalRes = await db.collection('rental')
         .where({
           type: 0,
           status: db.command.neq(2),
-          is_delete: false
+          is_delete: false,
+          create_by: app.globalData.openId
         })
         .orderBy('expireTime', 'asc')
         .get()
@@ -88,15 +105,14 @@ Page({
         return
       }
 
-      // 查询所有相关车辆信息
+      // 查询所有相关车辆信息（同样需要 create_by 过滤）
       const carRes = await db.collection('car')
         .where({
           _id: db.command.in(carIds),
-          is_delete: false
+          is_delete: false,
+          create_by: app.globalData.openId
         })
         .get()
-
-      wx.hideLoading()
 
       const carMap = {}
       carRes.data.forEach(car => {
@@ -145,11 +161,18 @@ Page({
         }
       })
 
+      wx.hideLoading()
       this.setData({
         loading: false,
         orders: orders,
         status0Orders: status0Orders,
         status1Orders: status1Orders
+      }, () => {
+        // 如果是从订阅消息点击进入，自动滚动到对应订单
+        if (this.highlightOrderId) {
+          this.scrollToOrder(this.highlightOrderId)
+          this.highlightOrderId = null // 清除，避免重复
+        }
       })
     } catch (err) {
       wx.hideLoading()
@@ -164,7 +187,10 @@ Page({
     if (!expireTime) return '无'
 
     const now = new Date()
-    const expireDate = new Date(expireTime.replace(/-/g, '/'))
+    // expireTime 可能是 Date 对象或时间戳
+    const expireDate = expireTime instanceof Date
+      ? expireTime
+      : new Date(expireTime)
     const diff = expireDate - now
 
     if (diff < 0) {

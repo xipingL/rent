@@ -47,12 +47,21 @@ Page({
         }
         const vehicle = carRes.data[0]
 
-        // 获取该车辆所有生效中的租聘记录
+        // 权限校验：只有创建人可以操作
+        if (vehicle.create_by !== app.globalData.openId) {
+          wx.hideLoading()
+          wx.showToast({ title: '无权操作此车辆', icon: 'none' })
+          setTimeout(() => wx.navigateBack(), 1500)
+          return
+        }
+
+        // 获取该车辆所有生效中或待结算的租聘记录（只查询自己的）
         db.collection('rental')
           .where({
             carId: options.id,
-            status: 0,
-            is_delete: false
+            status: db.command.in([0, 1]),
+            is_delete: false,
+            create_by: app.globalData.openId
           })
           .orderBy('createTime', 'asc')
           .get({
@@ -76,7 +85,8 @@ Page({
                 db.collection('rental')
                   .where({
                     carId: options.id,
-                    type: 1
+                    type: 1,
+                    create_by: app.globalData.openId
                   })
                   .count({
                     success: (countRes) => {
@@ -176,7 +186,7 @@ Page({
     // 使用最新一条租聘记录的到期时间
     const latestRental = rentals[rentals.length - 1]
     const now = new Date()
-    const expireDate = new Date(latestRental.expireTime.replace(/-/g, '/'))
+    const expireDate = latestRental.expireTime instanceof Date ? latestRental.expireTime : new Date(latestRental.expireTime)
     const diff = expireDate - now
 
     let text = ''
@@ -220,7 +230,7 @@ Page({
 
     // 使用最新一条租聘记录的到期时间
     const latestRental = rentals[rentals.length - 1]
-    const expireDate = new Date(latestRental.expireTime.replace(/-/g, '/'))
+    const expireDate = latestRental.expireTime instanceof Date ? latestRental.expireTime : new Date(latestRental.expireTime)
     expireDate.setDate(expireDate.getDate() + actualDuration)
 
     const year = expireDate.getFullYear()
@@ -248,7 +258,7 @@ Page({
       return
     }
 
-    wx.showLoading({ title: '保存中...' })
+    wx.showLoading({ title: '提交中...' })
 
     // 使用最新一条租聘记录
     const latestRental = rentals[rentals.length - 1]
@@ -260,22 +270,31 @@ Page({
         parentRentalId: latestRental._id,
         startTime: latestRental.expireTime,
         duration: actualDuration,
-        expireTime: expireTime,
+        expireTime: new Date(expireTime),
         status: 0,
         type: 1,
         is_delete: false,
+        create_by: app.globalData.openId,
         createTime: db.serverDate()
-      },
-      success: (res) => {
-        wx.hideLoading()
-        wx.showToast({ title: '续租成功', icon: 'success' })
-        setTimeout(() => wx.navigateBack(), 1500)
-      },
-      fail: (err) => {
-        wx.hideLoading()
-        console.error('续租失败', err)
-        wx.showToast({ title: '续租失败', icon: 'error' })
       }
+    }).then(res => {
+      // 写入操作日志
+      return app.addOperationLog({
+        collection: 'rental',
+        record_id: res._id,
+        action: 'renew',
+        car_id: vehicle._id,
+        remark: `${latestRental.renterName}，续租${actualDuration}天，到期时间${expireTime}`
+      }).then(() => res)
+    }).then(res => {
+      // 所有操作完成，立即跳转
+      wx.hideLoading()
+      wx.redirectTo({ url: '/subPackages/car/pages/garage/garage' })
+      return res
+    }).catch(err => {
+      wx.hideLoading()
+      console.error('续租失败', err)
+      wx.showToast({ title: '续租失败', icon: 'error' })
     })
   }
 })

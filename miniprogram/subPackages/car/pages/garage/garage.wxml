@@ -4,13 +4,18 @@
   <view class="header">
     <view class="header-left">
       <view class="back-btn" bindtap="goBack">←</view>
-      <view class="header-title">我的车库</view>
+      <view class="header-title">{{selectMode ? '选择车辆' : '我的车库'}}</view>
     </view>
     <view class="add-btn" bindtap="goToAdd">+</view>
   </view>
 
+  <!-- 选择模式提示 -->
+  <view class="select-hint" wx:if="{{selectMode}}">
+    <text>{{selectHint}}</text>
+  </view>
+
   <!-- 标签页 -->
-  <view class="tabs">
+  <view class="tabs" wx:if="{{!selectMode}}">
     <view class="tab {{currentTab === 0 ? 'active' : ''}}" bindtap="switchTab" data-idx="0">全部</view>
     <view class="tab {{currentTab === 1 ? 'active' : ''}}" bindtap="switchTab" data-idx="1">空闲</view>
     <view class="tab {{currentTab === 2 ? 'active' : ''}}" bindtap="switchTab" data-idx="2">租聘中</view>
@@ -19,10 +24,15 @@
 
   <!-- 内容区 -->
   <scroll-view class="content" scroll-y>
-    <block wx:for="{{vehicles}}" wx:key="_id">
-      <view class="vehicle-card" wx:if="{{currentTab === 0 || item.status === filterStatus[currentTab]}}">
-        <view class="vehicle-image" bindtap="goToDetail" data-id="{{item._id}}">
-          <image class="vehicle-img" src="{{item.image}}"></image>
+    <!-- 空状态（加载完成后且列表为空才显示） -->
+    <view class="empty-state" wx:if="{{!loading && filteredVehicles.length === 0}}">
+      <image class="empty-image" src="{{currentTab === 0 ? '/images/empty-car.png' : '/images/empty-car-notfont.png'}}" mode="aspectFit"></image>
+    </view>
+
+    <block wx:for="{{filteredVehicles}}" wx:key="_id">
+      <view class="vehicle-card" bindtap="{{selectMode ? 'selectVehicle' : 'goToDetail'}}" data-id="{{item._id}}" data-status="{{item.status}}">
+        <view class="vehicle-image">
+          <image class="vehicle-img" src="{{item.imageUrl || item.image}}"></image>
           <view class="vehicle-status status-{{item.status}}">{{statusText[item.status]}}</view>
         </view>
         <view class="vehicle-info">
@@ -54,7 +64,8 @@
             <text class="note-label">备注</text>
             <text>{{item.note}}</text>
           </view>
-          <view class="vehicle-actions">
+          <!-- 非选择模式下显示操作按钮 -->
+          <view class="vehicle-actions" wx:if="{{!selectMode}}">
             <button class="action-btn btn-rent {{item.status === 0 ? 'btn-wide' : ''}}" wx:if="{{item.status === 0}}" catchtap="goToRental" data-id="{{item._id}}">租聘</button>
             <button class="action-btn btn-renew" wx:if="{{item.status === 1 || item.status === 2}}" catchtap="goToRenew" data-id="{{item._id}}">续租</button>
             <button class="action-btn btn-settle" wx:if="{{item.status === 1 || item.status === 2}}" catchtap="goToSettle" data-id="{{item._id}}">结算</button>

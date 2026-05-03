@@ -10,9 +10,8 @@ Page({
     idCardFront: '',
     idCardBack: '',
     vehiclePhotos: [],
-    startTime: '',
-    startTimeStamp: Date.now(),
-    tempTimeStamp: Date.now(),
+    startTime: Date.now(),      // 时间戳，用于计算
+    startTimeStr: '',           // 格式化字符串，用于展示
     minDate: new Date().getTime() - 7 * 24 * 60 * 60 * 1000,
     showPicker: false,
     duration: 7,
@@ -25,7 +24,8 @@ Page({
       { values: ['0天', '1天', '2天', '3天', '4天', '5天', '6天', '7天', '8天', '9天', '10天', '11天', '12天', '13天', '14天', '15天', '16天', '17天', '18天', '19天', '20天', '21天', '22天', '23天', '24天', '25天', '26天', '27天', '28天', '29天', '30天', '31天'], className: 'day', defaultIndex: 1 }
     ],
     selectedDuration: [0, 0, 1],
-    expireTime: ''
+    expireTime: 0,              // 时间戳，用于计算
+    expireTimeStr: ''           // 格式化字符串，用于展示
   },
 
   initDurationColumns() {
@@ -57,6 +57,14 @@ Page({
           return
         }
 
+        // 权限校验：只有创建人可以操作租车
+        if (res.data.create_by !== app.globalData.openId) {
+          wx.showToast({ title: '无权操作此车辆', icon: 'none' })
+          this.setData({ loading: false })
+          setTimeout(() => wx.navigateBack(), 1500)
+          return
+        }
+
         if (res.data.status !== 0) {
           wx.showToast({ title: '该车辆不可租聘', icon: 'error' })
           this.setData({ loading: false })
@@ -66,13 +74,9 @@ Page({
 
         this.setData({
           loading: false,
-          vehicle: res.data
-        })
-
-        const now = new Date()
-        this.setData({
-          startTime: this.formatDate(now),
-          startTimeStamp: now.getTime()
+          vehicle: res.data,
+          startTime: Date.now(),
+          startTimeStr: this.formatDate(new Date())
         })
         this.calculateExpireTime()
       },
@@ -118,10 +122,10 @@ Page({
     const { startTime, duration, customDuration } = this.data
     const days = duration === -1 ? (parseInt(customDuration) || 0) : duration
     if (days > 0 && startTime) {
-      const start = new Date(startTime.replace(/-/g, '/'))
-      const expire = this.addDays(start, days)
+      const expireMs = startTime + days * 24 * 60 * 60 * 1000
       this.setData({
-        expireTime: this.formatDate(expire)
+        expireTime: expireMs,
+        expireTimeStr: this.formatDate(new Date(expireMs))
       })
     }
   },
@@ -192,16 +196,14 @@ Page({
   },
 
   onDateTimeConfirm(event) {
-    // 确认时使用当前时间戳更新显示的时间
+    // picker 返回的就是时间戳
     let timestamp = event.detail
-    // 确保时间戳有效
     if (!timestamp || isNaN(timestamp)) {
       timestamp = Date.now()
     }
-    const date = new Date(timestamp)
     this.setData({
-      startTime: this.formatDate(date),
-      startTimeStamp: timestamp,
+      startTime: timestamp,
+      startTimeStr: this.formatDate(new Date(timestamp)),
       showPicker: false
     })
     this.calculateExpireTime()
@@ -317,57 +319,79 @@ Page({
       return
     }
 
-    wx.showLoading({ title: '保存中...' })
-
     const { idCardFront, idCardBack, vehiclePhotos, vehicle, name, phone, startTime, duration, customDuration, expireTime } = this.data
-
-    // 收集所有需要上传的临时文件
     const filesToUpload = [idCardFront, idCardBack, ...vehiclePhotos]
+    const openid = app.globalData.openId || ''
 
-    // 直接上传到云存储
+    wx.showLoading({ title: '提交中...' })
+
+    // 请求订阅消息（等待用户响应后再继续）
+    wx.requestSubscribeMessage({
+      tmplIds: ['Kpp_Cw-mOX28aKmWmvfcE-XCmi8YtkpU6_el84_4Ttc'],
+      success: (res) => {
+        console.log('订阅消息请求成功', res)
+      },
+      fail: (err) => {
+        console.error('订阅消息请求失败', err)
+      }
+    }).finally(() => {
+      // 无论订阅消息结果如何，都继续保存流程
+      this.doSave(openid, filesToUpload)
+    })
+  },
+
+  doSave(openid, filesToUpload) {
+    const { vehicle, name, phone, startTime, duration, customDuration, expireTime } = this.data
+
     Promise.all(filesToUpload.map(f => this.uploadFile(f)))
       .then((fileIDs) => {
         const [idCardFrontCloud, idCardBackCloud, ...vehiclePhotoClouds] = fileIDs
         const actualDuration = duration === -1 ? parseInt(customDuration) : duration
 
         const db = wx.cloud.database()
-        db.collection('rental').add({
+        return db.collection('rental').add({
           data: {
             carId: vehicle._id,
             renterName: name,
             renterPhone: phone,
+            renterOpenId: openid,
             idCardFront: idCardFrontCloud,
             idCardBack: idCardBackCloud,
             vehiclePhotos: vehiclePhotoClouds.length > 0 ? vehiclePhotoClouds : (vehicle.photos || []),
-            startTime: startTime,
+            startTime: new Date(startTime),
             duration: actualDuration,
-            expireTime: expireTime,
+            expireTime: new Date(expireTime),
             status: 0,
             type: 0,
             is_delete: false,
+            create_by: app.globalData.openId,
             createTime: db.serverDate()
-          },
-          success: (res) => {
-            // 更新车辆状态为租聘中
+          }
+        }).then(res => {
+          // 同时更新车辆状态和写入日志
+          return Promise.all([
             db.collection('car').doc(vehicle._id).update({
               data: { status: 1 }
+            }),
+            app.addOperationLog({
+              collection: 'rental',
+              record_id: res._id,
+              action: 'rent',
+              car_id: vehicle._id,
+              remark: `${name}，${this.formatDateOnly(new Date(startTime))}至${this.formatDateOnly(new Date(expireTime))}`
             })
-
-            wx.hideLoading()
-            wx.showToast({ title: '租聘成功', icon: 'success' })
-            setTimeout(() => wx.navigateBack(), 1500)
-          },
-          fail: (err) => {
-            wx.hideLoading()
-            console.error('保存租聘信息失败', err)
-            wx.showToast({ title: '保存失败，请重试', icon: 'error' })
-          }
+          ]).then(() => res)
+        }).then(res => {
+          // 所有操作完成，立即跳转
+          wx.hideLoading()
+          wx.redirectTo({ url: '/subPackages/car/pages/garage/garage' })
+          return res
         })
       })
       .catch((err) => {
         wx.hideLoading()
-        console.error('租聘保存失败：', err)
-        wx.showToast({ title: '图片检查失败', icon: 'error' })
+        console.error('保存租聘信息失败', err)
+        wx.showToast({ title: '保存失败，请重试', icon: 'error' })
       })
   }
 })

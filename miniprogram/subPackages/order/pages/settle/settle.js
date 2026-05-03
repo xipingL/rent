@@ -1,4 +1,6 @@
 // pages/settle/settle.js
+const app = getApp()
+
 Page({
   data: {
     loading: true,
@@ -6,6 +8,18 @@ Page({
     rentals: [],
     settlePhotos: [],
     remark: ''
+  },
+
+  // 格式化日期
+  formatDate(date) {
+    if (!date) return ''
+    const d = new Date(date)
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    const hour = String(d.getHours()).padStart(2, '0')
+    const minute = String(d.getMinutes()).padStart(2, '0')
+    return `${year}-${month}-${day} ${hour}:${minute}`
   },
 
   onLoad(options) {
@@ -31,17 +45,33 @@ Page({
           return
         }
         const vehicle = carRes.data[0]
-        // 获取该车辆所有生效中的租聘记录
+
+        // 权限校验：只有创建人可以操作
+        if (vehicle.create_by !== app.globalData.openId) {
+          wx.hideLoading()
+          wx.showToast({ title: '无权操作此车辆', icon: 'none' })
+          setTimeout(() => wx.navigateBack(), 1500)
+          return
+        }
+
+        // 获取该车辆所有生效中或待结算的租聘记录（只查询自己的）
         db.collection('rental')
           .where({
             carId: options.id,
-            status: 0,
-            is_delete: false
+            status: db.command.in([0, 1]),
+            is_delete: false,
+            create_by: app.globalData.openId
           })
           .orderBy('createTime', 'asc')
           .get({
             success: (rentalRes) => {
               const rentals = rentalRes.data || []
+
+              // 格式化日期
+              rentals.forEach(r => {
+                r.startTimeStr = this.formatDate(r.startTime)
+                r.expireTimeStr = this.formatDate(r.expireTime)
+              })
 
               // 获取首次租聘的车辆照片临时URL
               if (rentals.length > 0 && rentals[0].vehiclePhotos && rentals[0].vehiclePhotos.length > 0) {
@@ -148,7 +178,7 @@ Page({
       return
     }
 
-    wx.showLoading({ title: '保存中...' })
+    wx.showLoading({ title: '提交中...' })
 
     // 上传结算照片
     const uploadPromises = settlePhotos.length > 0
@@ -171,7 +201,7 @@ Page({
           })
         })
 
-        // 更新车辆状态为空闲
+        // 更新车辆状态为空闲（2 → 0）
         updatePromises.push(
           db.collection('car').doc(vehicle._id).update({
             data: { status: 0 }
@@ -181,9 +211,19 @@ Page({
         return Promise.all(updatePromises)
       })
       .then(() => {
+        // 写入操作日志
+        return app.addOperationLog({
+          collection: 'rental',
+          record_id: rentals[0]._id,
+          action: 'settle',
+          car_id: vehicle._id,
+          remark: `${rentals[0].renterName}，${vehicle.name}[${vehicle.plateNo}]，已归还`
+        })
+      })
+      .then(() => {
+        // 所有操作完成，立即跳转
         wx.hideLoading()
-        wx.showToast({ title: '结算成功', icon: 'success' })
-        setTimeout(() => wx.navigateBack(), 1500)
+        wx.redirectTo({ url: '/subPackages/car/pages/garage/garage' })
       })
       .catch((err) => {
         wx.hideLoading()

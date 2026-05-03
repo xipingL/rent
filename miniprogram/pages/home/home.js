@@ -1,15 +1,24 @@
 // pages/home/home.js
+const app = getApp()
+
 Page({
   data: {
+    loading: true,
     rentalCount: 0,
-    todayOrders: 0
-  },
-
-  onLoad() {
-    this.loadStats();
+    todayOrders: 0,
+    stats: {
+      totalCars: 0,
+      rentingCars: 0,
+      idleCars: 0,
+      pendingSettle: 0
+    }
   },
 
   onShow() {
+    // 等 openId 准备好再查
+    if (!app.globalData.openId) {
+      return setTimeout(() => this.onShow(), 500)
+    }
     this.loadStats();
     if (typeof this.getTabBar === 'function') {
       this.getTabBar().setData({ active: 0 });
@@ -17,14 +26,55 @@ Page({
   },
 
   // 加载统计数据
-  loadStats() {
-    const app = getApp();
-    const vehicles = app.globalData?.vehicles || [];
-    const rentingCount = vehicles.filter(v => v.status === 'renting').length;
-    this.setData({
-      rentalCount: rentingCount || 128,
-      todayOrders: 36
-    });
+  async loadStats() {
+    const db = wx.cloud.database()
+    try {
+      // 查询当前用户的车辆
+      const carRes = await db.collection('car')
+        .where({
+          is_delete: false,
+          create_by: app.globalData.openId
+        })
+        .get()
+      const cars = carRes.data || []
+      const totalCars = cars.length
+      const rentingCars = cars.filter(c => c.status === 1).length
+      const idleCars = cars.filter(c => c.status === 0).length
+      const pendingSettle = cars.filter(c => c.status === 2).length
+
+      // 查询今日订单数
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const tomorrow = new Date(today)
+      tomorrow.setDate(tomorrow.getDate() + 1)
+
+      const orderRes = await db.collection('rental')
+        .where({
+          is_delete: false,
+          create_by: app.globalData.openId,
+          createTime: db.command.gte(today)
+        })
+        .count()
+
+      this.setData({
+        loading: false,
+        stats: {
+          totalCars,
+          rentingCars,
+          idleCars,
+          pendingSettle
+        },
+        rentalCount: rentingCars,
+        todayOrders: orderRes.total || 0
+      })
+    } catch (e) {
+      console.error('加载统计数据失败', e)
+      this.setData({
+        loading: false,
+        rentalCount: 0,
+        todayOrders: 0
+      })
+    }
   },
 
   // 跳转到我的车库
@@ -32,19 +82,19 @@ Page({
     wx.navigateTo({ url: '/subPackages/car/pages/garage/garage' });
   },
 
-  // 跳转到租车
+  // 跳转到租车 - 先选择车辆（carStatus=0 空闲）
   goToRental() {
-    wx.navigateTo({ url: '/subPackages/order/pages/rental/rental' });
+    wx.navigateTo({ url: '/subPackages/car/pages/garage/garage?carStatus=0' });
   },
 
-  // 跳转到结算（退租）
-  goToSettle() {
-    wx.navigateTo({ url: '/subPackages/order/pages/settle/settle' });
-  },
-
-  // 跳转到续租
+  // 跳转到续租 - 先选择车辆（carStatus=1 租聘中）
   goToRenew() {
-    wx.navigateTo({ url: '/subPackages/order/pages/renew/renew' });
+    wx.navigateTo({ url: '/subPackages/car/pages/garage/garage?carStatus=1' });
+  },
+
+  // 跳转到结算 - 先选择车辆（carStatus=2 待结算）
+  goToSettle() {
+    wx.navigateTo({ url: '/subPackages/car/pages/garage/garage?carStatus=2' });
   },
 
   // 跳转到订单列表

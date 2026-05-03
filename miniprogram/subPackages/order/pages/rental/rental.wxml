@@ -73,11 +73,11 @@
 
       <view class="form-group">
         <text class="form-label">起租时间</text>
-        <view class="picker-input" bindtap="showDateTimePicker">{{startTime || '请选择起租时间'}}</view>
+        <view class="picker-input" bindtap="showDateTimePicker">{{startTimeStr || '请选择起租时间'}}</view>
         <van-popup show="{{showPicker}}" round position="bottom" bind:close="closeDateTimePicker">
           <van-datetime-picker
             type="datetime"
-            value="{{startTimeStamp}}"
+            value="{{startTime}}"
             bind:confirm="onDateTimeConfirm"
             bind:cancel="closeDateTimePicker"
             min-date="{{minDate}}"
@@ -116,7 +116,7 @@
         <text class="form-label">到期时间</text>
         <view class="expire-time">
           <text class="expire-label">预计归还时间</text>
-          <text class="expire-value">{{expireTime}}</text>
+          <text class="expire-value">{{expireTimeStr}}</text>
         </view>
       </view>
     </view>

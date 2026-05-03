@@ -1,7 +1,12 @@
 <!--pages/home/home.wxml-->
 <view class="container">
+  <!-- 加载中 -->
+  <view class="loading-view" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
   <!-- 头部区域 -->
-  <view class="header">
+  <view class="header" wx:else>
     <view class="header-top">
       <view class="header-title">YeaRent</view>
       <view class="header-subtitle">商家电瓶车租聘管理平台</view>
@@ -9,8 +14,12 @@
     <!-- 统计卡片 -->
     <view class="stats-card">
       <view class="stat-item">
-        <view class="stat-number">{{rentalCount}}</view>
+        <view class="stat-number">{{stats.rentingCars}}</view>
         <view class="stat-label">在租车辆</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number">{{stats.idleCars}}</view>
+        <view class="stat-label">空闲车辆</view>
       </view>
       <view class="stat-item">
         <view class="stat-number">{{todayOrders}}</view>
@@ -30,17 +39,22 @@
         <text class="garage-desc">管理您的全部车辆</text>
       </view>
 
-      <!-- 两个功能卡片 -->
+      <!-- 三个功能卡片 -->
       <view class="func-row">
         <view class="func-card" bindtap="goToRental">
-          <view class="func-icon">🚲</view>
+          <view class="func-icon">🔑</view>
           <text class="func-title">租聘</text>
-          <text class="func-desc">租聘车辆</text>
+          <text class="func-desc">开始租车</text>
+        </view>
+        <view class="func-card" bindtap="goToRenew">
+          <view class="func-icon">🔄</view>
+          <text class="func-title">续租</text>
+          <text class="func-desc">延长租期</text>
         </view>
         <view class="func-card" bindtap="goToSettle">
-          <view class="func-icon">↩️</view>
-          <text class="func-title">退租</text>
-          <text class="func-desc">车辆退还</text>
+          <view class="func-icon">🧾</view>
+          <text class="func-title">结算</text>
+          <text class="func-desc">费用结算</text>
         </view>
       </view>
     </view>
